@@ -1,0 +1,198 @@
+@charset "UTF-8";
+*{
+	/*** フォント指定 ***/
+	font-family:
+		"メイリオ", Meiryo, /* win7,vista */
+		"ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro",/* mac */
+		"ＭＳ Ｐゴシック", "MS PGothic", sans-serif; /* その他 */
+}
+
+body {
+	/* 基本文字サイズ */
+	font-size: 13px;
+	/* ページ全体を中央配置 */
+	margin:0 auto;
+	/* 背景色 */
+	background-color: #F2F2F2;
+}
+
+/* 各種タイトルの文字サイズ */
+h1,h2,h3,h4,h5,h6 {
+	font-size: 100%;
+}
+
+#header {
+	margin: 0 auto; /* 中央配置 */
+	position: relative; /* 相対位置への配置 */
+}
+
+#header_logo {
+	width: 185px;
+	height: 47px;
+	background-color: #FFFFFF;
+
+	margin: 8px 0px 0px 8px;
+	padding: 1px 1px 1px 1px;
+
+	/* box-shadow */
+	box-shadow:0px 0px 6px 3px rgba(0,0,0,0.1);
+	-moz-box-shadow:0px 0px 6px 3px rgba(0,0,0,0.1);
+	-webkit-box-shadow:0px 0px 6px 3px rgba(0,0,0,0.1);
+
+	/* border-radius */
+	border-radius:8px;
+	-moz-border-radius:8px;
+	-webkit-border-radius:8px;
+}
+#header_logo a {
+	/* リンク文字色 */
+	color: #0000D2;
+	/* リンク下線 */
+	text-decoration: none;
+}
+
+#logo_wrapper {
+	display: flex;
+	/* 横並び・左から右 */
+	flex-direction: row;
+	/* 折り返しなし・単一行 */
+	flex-wrap: no-wrap;
+	/* 垂直方向中央揃え */
+	align-items: center;
+}
+#header-img1 {
+	margin: 2px 0px 0px 3px;
+	padding: 0px 3px 0px 0px;
+}
+
+#logo_name {
+	font-size:220%;
+	margin: 3px 0px 0px 6px;
+}
+
+#main {
+	/* width: 1200px; */
+	max-width: 780px;
+	margin: 0 auto; /* 中央配置 */
+}
+
+.title {
+	font-size: 100%;
+	color: #444444;
+}
+
+#target_anker_next_match {
+	background-color: #FFFFFF;
+}
+
+#target_anker_next_match p {
+	margin: 5px 0px 10px 0px;
+	padding: 3px 3px 3px 3px;
+
+	text-align: center;
+
+	border-color : #C0C0C0;
+	border-width : 1px;
+	border-style : solid;
+
+	border-top-left-radius: 5px;
+  	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+	border-bottom-left-radius: 5px;
+}
+#target_anker_next_match a:link {
+	color: #0000D2; /* 文字色 */
+}
+#target_anker_next_match a:hover {
+	text-decoration: underline;
+}
+
+#match_schedule_data h4 {
+	height: 30px;
+	line-height: 30px; /* heightと同値により文字を縦方向中央揃え */
+	color: #FFFFFF; /* 文字色 */
+	background-color: #0000D2; /* 背景色 */
+	margin: 0 0 0 0px;
+}
+#match_schedule_data h4 span {
+	margin: 0 0 0 10px;
+}
+
+.matchday_num a {
+	color: #FFFFFF; /* 文字色 */
+
+}
+
+.match_schedule_table {
+	width: 100%;
+	background-color: #FFFFFF;
+	border-collapse: collapse;
+	table-layout: fixed;
+	margin: 2px 2px 2px 0px;
+}
+.match_schedule_table ul {
+	margin: 0px 0px 0px 0px;
+}
+.match_schedule_table li {
+	list-style-type: none;
+}
+
+.table_tr_set1 {
+	margin: 0px 0px 0px 0px;
+}
+
+.td_set1 {
+	font-size: 12px;
+	text-align: right; /* 文字を中央寄せ */
+	vertical-align: middle; /* 文字を垂直方向中央 */
+}
+
+.td_set2 {
+	width: 70px;
+	font-size: 24px;
+	text-align: right; /* 文字を左寄せ */
+	font-weight: bold; /* 文字を太字 */
+	vertical-align: middle; /* 文字を垂直方向中央 */
+}
+
+.td_set3 {
+	font-size: 12px;
+	text-align: left; /* 文字を右寄せ */
+	font-weight: normal; /* 文字を太字 */
+	vertical-align: middle; /* 文字を垂直方向中央 */
+}
+
+.td_set4 {
+	width: 180px;
+	font-size: 10px;
+	text-align: left; /* 文字を中央寄せ */
+	font-weight: normal; /* 文字は通常 */
+	vertical-align: middle; /* 文字を垂直方向中央 */
+}
+
+.td_set5 {
+	width: 80px;
+	font-size: 12px;
+	text-align: center; /* 文字を中央寄せ */
+	font-weight: normal; /* 文字は通常 */
+	vertical-align: middle;
+}
+.td_set5 ul {
+	padding: 0 0 0 0;
+}
+
+.td_set6 {
+	width: 70px;
+	font-size: 24px;
+	text-align: left; /* 文字を左寄せ */
+	font-weight: bold; /* 文字を太字 */
+	vertical-align: middle; /* 文字を垂直方向中央 */
+}
+
+#match_state {
+	font-size: 10px;
+}
+
+#time_and_date_undecided {
+	font-size: 10px;
+}
