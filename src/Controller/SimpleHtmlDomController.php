@@ -15,8 +15,7 @@
 
     class SimpleHtmlDomController extends AppController {
 
-        public function index()
-        {
+        public function index() {
             debug('試合日程データ登録処理開始');
             Log::info('J1試合日程データ取得開始', 'simple_html_dom');
 
@@ -129,8 +128,8 @@
                             $time_stadium[$key] = array(
                                 // 試合開始時刻を設定
                                 'time' => $time_stadium_explode[0],
-                                // 略称のスタジアム名を設定
-                                'stadium_short_name' => $time_stadium_explode[1],
+                                // 略称のスタジアム名を設定(全角英数字を半角へ変換)
+                                'stadium_short_name' => mb_convert_kana($time_stadium_explode[1], 'rn'),
                             );
                             // idに+1を行い更新
                             $time_stadium_key_id = $time_stadium_key_id + 1;
@@ -182,7 +181,13 @@
                         // チーム名格納用配列初期化
                         $team_names = array();
                         foreach($result_team_names as $element_team_names){
-                            $team_names['team_names'][] = trim($element_team_names->plaintext);
+                            $tmp_team_names = '';
+                            // チーム名の先頭、末尾にあるスペースを削除
+                            $tmp_team_names = trim($element_team_names->plaintext);
+                            // チーム名の全角英数字を半角へ変換
+                            $tmp_team_names = mb_convert_kana($tmp_team_names, 'rn');
+                            // チーム名格納用配列へ格納
+                            $team_names['team_names'][] = $tmp_team_names;
                         }
 // debug($team_names);
 
@@ -267,7 +272,7 @@
                 unset($dom);
 
                 // Model呼び出しのため
-                $jleaged1matchdata2018 = TableRegistry::get('JleageD1Matchdata2018'); // 2017-2018シーズン用デーブル
+                $jleaged1matchdata2018 = TableRegistry::get('JleageD1Matchdata2018'); // 2017-2018シーズン用テーブル
                 // データ保存
                 $jleaged1matchdata2018->registerData($data_key, $data);
                 // 1秒待機

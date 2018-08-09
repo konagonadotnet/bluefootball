@@ -1,19 +1,11 @@
 @charset "UTF-8";
-*{
-	/*** フォント指定 ***/
-	font-family:
-		"メイリオ", Meiryo, /* win7,vista */
-		"ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro",/* mac */
-		"ＭＳ Ｐゴシック", "MS PGothic", sans-serif; /* その他 */
-}
-
+@import url(http://fonts.googleapis.com/earlyaccess/notosansjapanese.css);
 body {
-	/* 基本文字サイズ */
-	font-size: 13px;
-	/* ページ全体を中央配置 */
-	margin:0 auto;
-	/* 背景色 */
-	background-color: #F2F2F2;
+    font-family: "Noto Sans JP", "游ゴシック Medium", "游ゴシック体", "Yu Gothic Medium", YuGothic, "ヒラギノ角ゴ ProN", "Hiragino Kaku Gothic ProN", "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+	margin: 0 auto; /* ページ全体を中央配置 */
+	font-size: 13px; /* 基本文字サイズ */
+	text-rendering : optimizeLegibility; /* ブラウザーは速さや位置の正確さよりも、読みやすさを強調します。カーニングを有効にし、合字は任意 */
+	background-color: #F2F2F2; /* 背景色 */
 }
 
 /* 各種タイトルの文字サイズ */
@@ -22,31 +14,43 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 #header {
+	height: 38px;
 	margin: 0 auto; /* 中央配置 */
 	position: relative; /* 相対位置への配置 */
+	background-color: #4169e1; /* 背景色 */
+	display: flex;/* 直下の要素を並列指定 */
 }
 
 #header_logo {
-	width: 185px;
-	height: 47px;
+	width: 132px;
+	height: 33px;
 	background-color: #FFFFFF;
 
-	margin: 8px 0px 0px 8px;
-	padding: 1px 1px 1px 1px;
+	margin-top: 2px;
+	margin-left: 6px;
+
+	display: flex;
+	/* 横並び・左から右 */
+	flex-direction: row;
+	/* 折り返しなし・単一行 */
+	flex-wrap: no-wrap;
+	/* 垂直方向中央揃え */
+	align-items: center;
 
 	/* box-shadow */
-	box-shadow:0px 0px 6px 3px rgba(0,0,0,0.1);
+/*	box-shadow:0px 0px 6px 3px rgba(0,0,0,0.1);
 	-moz-box-shadow:0px 0px 6px 3px rgba(0,0,0,0.1);
 	-webkit-box-shadow:0px 0px 6px 3px rgba(0,0,0,0.1);
-
+*/
 	/* border-radius */
 	border-radius:8px;
 	-moz-border-radius:8px;
 	-webkit-border-radius:8px;
 }
 #header_logo a {
+	font-weight: bold;
 	/* リンク文字色 */
-	color: #0000D2;
+	color: #4169e1;
 	/* リンク下線 */
 	text-decoration: none;
 }
@@ -61,13 +65,55 @@ h1,h2,h3,h4,h5,h6 {
 	align-items: center;
 }
 #header-img1 {
-	margin: 2px 0px 0px 3px;
-	padding: 0px 3px 0px 0px;
+	margin: 0 0 0 5px;
+	padding: 0 0 0 0;
 }
 
 #logo_name {
-	font-size:220%;
+	font-size:150%;
 	margin: 3px 0px 0px 6px;
+}
+
+#navigation_bar {
+	height: 90%;
+	margin: 0 auto;
+}
+
+#nav {
+	height: 100%;
+	margin: 2px 0 0 8px;
+	list-style: none;
+	display: flex;
+	/* 横並び・左から右 */
+	flex-direction: row;
+	/* 折り返しなし・単一行 */
+	flex-wrap: no-wrap;
+	/* 垂直方向中央揃え */
+	align-items: center;
+	/* リンク文字色 */
+	color: #FFFFFF;
+}
+#nav a {
+	text-decoration: none;
+	/* リンク文字色 */
+	color: #FFFFFF;
+
+	font-weight: bold;
+}
+#nav a:hover {
+	text-decoration: none;
+	/* リンク文字色 */
+	color: #4169e1;
+	/* リンク背景 */
+	background-color: #FFFFFF;
+}
+#nav li {
+	padding: 0.2rem 1.5rem 0.2rem 1.5rem;
+	font-size: 90%;
+}
+
+.nav_left {
+	border-right: solid #FFFFFF 1px;
 }
 
 #main {
@@ -76,9 +122,27 @@ h1,h2,h3,h4,h5,h6 {
 	margin: 0 auto; /* 中央配置 */
 }
 
+.paging_list {
+	padding: 0.5rem 0 0.5rem 0;
+}
+.paging_list p {
+	margin:0 0 0 0;
+
+	color: #444444; /* 文字色 */
+	font-size: 90%; /* 文字サイズ */
+}
+
 .title {
-	font-size: 100%;
-	color: #444444;
+	padding: 0.3rem 0 0.3rem 0;
+	background-color: #4169e1; /* 背景色 */
+	display: flex;/* 直下の要素を並列指定 */
+	vertical-align: middle; /* 文字を垂直方向中央 */
+}
+.title h1{
+	margin:0 0 0 0.8rem;
+	font-size: 120%; /* 文字サイズ */
+	font-weight: bold;
+	color: #FFFFFF; /* 文字色 */
 }
 
 #target_anker_next_match {
@@ -89,6 +153,7 @@ h1,h2,h3,h4,h5,h6 {
 	margin: 5px 0px 10px 0px;
 	padding: 3px 3px 3px 3px;
 
+	font-weight: bold;
 	text-align: center;
 
 	border-color : #C0C0C0;
@@ -101,26 +166,53 @@ h1,h2,h3,h4,h5,h6 {
 	border-bottom-left-radius: 5px;
 }
 #target_anker_next_match a:link {
-	color: #0000D2; /* 文字色 */
+	color: #4169e1; /* リンクの文字色 */
 }
 #target_anker_next_match a:hover {
 	text-decoration: underline;
 }
 
-#match_schedule_data h4 {
+.matchday_contents {
+	padding: 0 0 6 0;
+}
+
+.matchday_num {
+	width: 100%;
+	padding: 1rem 0 0 0;
+}
+
+.matchday_num h4 {
+	width: 18%;
 	height: 30px;
+	margin: 0 0 0 0;
 	line-height: 30px; /* heightと同値により文字を縦方向中央揃え */
+	text-align: center;
 	color: #FFFFFF; /* 文字色 */
-	background-color: #0000D2; /* 背景色 */
-	margin: 0 0 0 0px;
+	font-weight: bold;
+	background-color: #4169e1; /* 背景色 */
 }
-#match_schedule_data h4 span {
-	margin: 0 0 0 10px;
+.matchday_num span {
+	margin: 0 0 0 0;
 }
-
 .matchday_num a {
-	color: #FFFFFF; /* 文字色 */
+	color: #FFFFFF; /* リンクの文字色 */
+}
 
+.match_day h5 {
+	font-size: 110%;
+	padding: 0.3rem 0 0 1.5rem; /*アイコン分のスペース*/
+	margin:0 0 0.2rem 0;
+	line-height: 1.5; /* 行の高さ */
+	position: relative; /* 相対位置 */
+}
+.match_day h5:before {
+	font-family: "Font Awesome 5 Free";
+	content: "\f274"; /*アイコンのユニコード*/
+	position: absolute; /*絶対位置*/
+	font-size: 1.5em; /*サイズ*/
+	left: 0; /*アイコンの位置*/
+	top: 0; /*アイコンの位置*/
+	color: #4169e1; /*アイコン色*/
 }
 
 .match_schedule_table {
@@ -128,7 +220,7 @@ h1,h2,h3,h4,h5,h6 {
 	background-color: #FFFFFF;
 	border-collapse: collapse;
 	table-layout: fixed;
-	margin: 2px 2px 2px 0px;
+	margin: 0px 2px 2px 0px;
 }
 .match_schedule_table ul {
 	margin: 0px 0px 0px 0px;
@@ -139,11 +231,17 @@ h1,h2,h3,h4,h5,h6 {
 
 .table_tr_set1 {
 	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+}
+.table_tr_set2  {
+	padding: 0 0 0 0;
+	margin: 0 0 0 0;
 }
 
 .td_set1 {
-	font-size: 12px;
-	text-align: right; /* 文字を中央寄せ */
+	font-size: 0.9rem;
+	font-weight: bold; /* 文字を太字 */
+	text-align: right; /* 文字を右寄せ */
 	vertical-align: middle; /* 文字を垂直方向中央 */
 }
 
@@ -156,9 +254,9 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 .td_set3 {
-	font-size: 12px;
+	font-size: 0.9rem;
+	font-weight: bold; /* 文字を太字 */
 	text-align: left; /* 文字を右寄せ */
-	font-weight: normal; /* 文字を太字 */
 	vertical-align: middle; /* 文字を垂直方向中央 */
 }
 
@@ -176,6 +274,8 @@ h1,h2,h3,h4,h5,h6 {
 	text-align: center; /* 文字を中央寄せ */
 	font-weight: normal; /* 文字は通常 */
 	vertical-align: middle;
+
+	padding: 0 0 0 0;
 }
 .td_set5 ul {
 	padding: 0 0 0 0;
@@ -189,6 +289,14 @@ h1,h2,h3,h4,h5,h6 {
 	vertical-align: middle; /* 文字を垂直方向中央 */
 }
 
+.td_set7 {
+	padding: 0 0 0.2rem 0;
+	margin: 0 0 0 0;
+
+	font-size: 0.7rem;
+	text-align: center; /* 文字を中央寄せ */
+}
+
 #match_state {
 	font-size: 10px;
 }
@@ -196,3 +304,39 @@ h1,h2,h3,h4,h5,h6 {
 #time_and_date_undecided {
 	font-size: 10px;
 }
+
+.table_title {
+	padding: 1rem 0 0.3rem 0;
+	display: flex;/* 直下の要素を並列指定 */
+	vertical-align: middle; /* 文字を垂直方向中央 */
+}
+.table_title h2{
+	margin:0 0 0 0;
+	padding: 0.3rem 0.8rem 0.3rem 0.8rem;
+	font-size: 120%; /* 文字サイズ */
+	font-weight: bold;
+	color: #FFFFFF; /* 文字色 */
+	background-color: #4169e1; /* 背景色 */
+}
+.table_caution p {
+	margin:0 0 0 0;
+	font-size: 90%; /* 文字サイズ */
+	text-align: right;
+}
+
+.footer_contents {
+	height: 76px;
+	margin: 0 auto; /* 中央配置 */
+	position: relative; /* 相対位置への配置 */
+	background-color: #4169e1; /* 背景色 */
+	display: flex;/* 直下の要素を並列指定 */
+	color: #FFFFFF; /* 文字色 */
+	align-items: center;
+	justify-content: center;
+}
+.footer_text p {
+	padding: 0 0 0 0;
+	margin: 0 0 0 0;
+	font-size: 90%;
+}
+

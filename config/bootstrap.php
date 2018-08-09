@@ -71,6 +71,7 @@ try {
 
     // 各種データ設定用configファイル
     Configure::load('data');
+    Configure::load('globalconstant');
 } catch (\Exception $e) {
     exit($e->getMessage() . "\n");
 }

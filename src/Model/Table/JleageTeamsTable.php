@@ -3,10 +3,8 @@ namespace App\Model\Table;
 
 use Cake\ORM\Table;
 
-class JleageTeamsTable extends Table
-{
-    public function initialize(array $config)
-    {
+class JleageTeamsTable extends Table {
+    public function initialize(array $config) {
         $this->setTable('jleague_teams');
         $this->setPrimaryKey('id');
     }

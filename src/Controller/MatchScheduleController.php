@@ -54,9 +54,8 @@
 
             // 試合日時データ取得
             $match_schedule_settoday_data = $jleaged1matchdata2018->getMatchScheduleSetToday($today);
+            // 次の試合が開催される節数取得
             $target_anker_id = $match_schedule_settoday_data->first()->get('MatchNum');
-            // debug($target_anker_id);
-            // exit();
 
             $count_num = 0;
             foreach ($match_schedule_data as $match_data) {
