@@ -19,10 +19,8 @@
             foreach($data as $element_data) {
                 // データチェック
                 $check_id = $this->checkDeta($element_data);
-// debug($check_id);
                 if ($check_id == 0) {
                     Log::info('DBのデータ存在チェック::::データが存在しません。新規登録開始 $check_id = '.$check_id, 'simple_html_dom');
-// debug($element_data);
                     // データの検証 (バリデーション)
                     $save_data = $this->newEntity($element_data);
                     // データが存在しない場合、DBへ保存
@@ -40,10 +38,8 @@
 
                     // データが存在する場合、$idからエンティティーを取得
                     $query_matchdata = $this->get($check_id); // データがなければ、NotFoundExceptionが投げられる。
-// debug($query_matchdata);
                     // objectから配列へ変換
                     $query_matchdata_array = $query_matchdata->toArray();
-// debug($query_matchdata_array);
 
                     // DBから取得した試合日格納用変数
                     $matchday_data = null;
@@ -66,7 +62,6 @@
                         // 試合日時が取得できていない場合、カラを変数へ格納
                         $matchday_time_data = $query_matchdata_array['MatchDayTime'];
                     }
-// debug($matchday_time_data);
 
                     // Webページから取得したデータとDBから取得した値を比較
                     if ($element_data['MatchDay'] != $matchday_data
@@ -79,7 +74,6 @@
                         || $element_data['Division'] != $query_matchdata_array['Division']
                         || $element_data['MatchNum'] != $query_matchdata_array['MatchNum']
                         ) {
-// debug('データが異なります');
                             // 比較結果をログへ保存
                             Log::info('Webページから取得したデータとDBから取得した値を比較::::データが異なります', 'simple_html_dom');
 
@@ -87,7 +81,6 @@
                             $this->patchEntity($query_matchdata, $element_data);
                             // DBへ上書き保存
                             if ($this->save($query_matchdata)) {
-// debug('保存成功');
                                 // 保存成功した場合、メッセージをログへ保存
                                 Log::info('Webページから取得したデータとDBから取得した値を比較::::データの上書き成功 $check_id = '.$check_id, 'simple_html_dom');
                             } else {
@@ -95,7 +88,6 @@
                                 Log::info('Webページから取得したデータとDBから取得した値を比較::::データの上書き失敗 $check_id = '.$check_id, 'simple_html_dom');
                             }
                     } else {
-// debug('DBと同じデータです');
                         // 比較結果をログへ保存
                         Log::info('Webページから取得したデータとDBから取得した値を比較::::データは同じため登録処理をスキップ $check_id = '.$check_id, 'simple_html_dom');
                     }
@@ -106,8 +98,6 @@
         }
 
         public function getMatchSchedule() {
-            debug('Model:getMatchSchedule');
-
             // Select文実行
             $query_data = $this->find();
             $query_data_all = $query_data->all();
@@ -115,7 +105,7 @@
                 // データが取得できなかった場合
                 return false;
             }
-            debug($query_data_all->toArray());
+
             return $query_data_all->toArray();
         }
 
@@ -153,7 +143,6 @@
                 ->where(['MatchDayTime IS NOT NULL'])
                 ->where(['HomeGetPoint IS NULL'])
                 ->where(['AwayGetPoint IS NULL'])
-                ->order(['MatchDayTime' => 'ASC'])
                 ->group(['MatchNum'])
                 ->all();
             if($query_data->count() == 0) {
@@ -169,10 +158,8 @@
             // Select文実行
             $query_data = $this->find()
                 ->where(['MatchNum' => $matchnum])
-                ->where(['MatchDay >=' => $today])
-                ->where(['MatchDayTime IS NOT NULL'])
-                ->where(['HomeGetPoint IS NULL'])
-                ->where(['AwayGetPoint IS NULL'])
+                ->where(['MatchDay IS NOT NULL'])
+                ->where(['MatchDayTime + interval 90 minute >=' => $today]) // 試合中のデータは取得しない
                 ->count();
             if(empty($query_data)) {
                 // データが取得できなかった場合
@@ -194,8 +181,6 @@
                 ->where(['HomeTeam' => $data['HomeTeam']])
                 ->where(['AwayTeam' => $data['AwayTeam']])
                 ->all();
-// debug($query_data);
-// debug($query_data->toArray());
 
             // 取得したデータ件数により有無を判定
             if($query_data->count() != 0) {

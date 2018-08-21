@@ -82,7 +82,7 @@
 						</tr>
 						<tr class="table_tr_set2">
 							<td class="td_set7" colspan="3">
-								<img class="stadium_icon" src="<?php echo $this->Url->build("/img/icn-stadium.png"); ?>" width="15" height="18" alt="サッカースタジアムアイコン">
+								<img class="stadium_icon" src="<?php echo $this->Url->build("/img/icn-stadium.png"); ?>" width="11" height="13.5" alt="サッカースタジアムアイコン">
     							<span><?= $data->StadiumName ?></span>
     						</td>
 						</tr>

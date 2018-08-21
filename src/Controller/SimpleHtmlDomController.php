@@ -233,14 +233,14 @@
                         $point_home_key = 0;
                         $point_away_key = 0;
                         for ($key_num = 0; $key_num < count($point); $key_num++) {
-                            if($key_num % 2 == 0) {
+                            if ($key_num % 2 == 0) {
                                 // 一意となるようid作成
                                 $key = $matchday_key.$point_home_team_key;
                                 // 試合データ格納用配列へHomeチームのゴール数を設定(偶数の場合)
                                 $data[$key] = array_merge($data[$key], array('HomeGetPoint' => $point[$key_num]));
                                 // idに+1を行い更新
                                 $point_home_team_key = $point_home_team_key + 1;
-                            }else{
+                            } else {
                                 // 一意となるようid作成
                                 $key = $matchday_key.$point_away_team_key;
                                 // 試合データ格納用配列へAwayチームのゴール数を設定(偶数の場合)

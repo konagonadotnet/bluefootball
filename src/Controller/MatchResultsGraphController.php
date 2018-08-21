@@ -18,15 +18,15 @@
     class MatchResultsGraphController extends AppController {
         /*
          public $paginate = [
-         'limit' => 18,
-         'order' => [
-         'MatchSchedule.id' => 'desc'
-         ]
+            'limit' => 18,
+            'order' => [
+                'MatchSchedule.id' => 'desc'
+            ]
          ];
 
          public function initialize() {
-         parent::initialize();
-         $this->loadComponent('Paginator');
+            parent::initialize();
+            $this->loadComponent('Paginator');
          }
          */
 
@@ -48,26 +48,23 @@
 
             // Model呼び出し
             $jleaged1matchdata2018 = TableRegistry::get('JleageD1Matchdata2018');
-            // 試合開催予定の節数を全て取得
+            // 各節数に対して未実施の試合が存在する節数を取得
             $target_match_num = $jleaged1matchdata2018->getMatchNumNotPlayGame($today);
             // 次の試合が開催される節数格納用変数初期化
             $target_anker_id = 0;
             // 次の試合が開催される節数を取得
             foreach ($target_match_num as $num) {
-                // 節数に対する未実施の試合数を取得
+                // 未実施の試合が存在する節に対して未実施の試合数を取得
                 $count_not_play_game_num = $jleaged1matchdata2018->getUnexecutedGameNum($num->MatchNum, $today);
                 if ($count_not_play_game_num == J1LEAGE_MATCHNUM_NUMBER_OF_GAME) {
-                    // 節数に対して全ての試合が未実施の場合、次の試合が開催される最新の節数として設定
+                    // 未実施の試合が存在する節に対して全ての試合が未実施の場合、次の試合が開催される最新の節数として設定
                     $target_anker_id = $num->MatchNum;
                     // ループを中断し抜ける
                     break;
                 }
             }
-
             // 次の試合が開催される節数を設定
             $graph_data['NextMatchNum'] = $target_anker_id;
-            // debug($graph_data);
-            // exit();
 
             // J1試合結果データをグラフ表示用データをviewへ渡す
             $this->set('results_data', $graph_data);
@@ -160,8 +157,6 @@
             }
             // 試合が終了済みの節数を設定
             $target_end_match_num = $target_anker_id - 1;
-            // debug($target_end_match_num);
-            // exit();
 
             // J1チームデータModel呼び出し
             $jleageteams = TableRegistry::get('JleageTeams');
@@ -390,8 +385,6 @@
                 $target_results_data_array = $target_results_data->toArray();
 
                 // 試合が実施済みかどうかチェック
-                // debug($target_results_data_array);
-                // exit();
                 foreach ($target_results_data_array as $data) {
                     // 試合結果カラムに値が設定されているかどうかチェック
                     if ($target_match_num != 1 && empty($data['Matchday'.$target_match_num.'Result'])) {
@@ -416,20 +409,12 @@
                                 ->all();
                             // 参照用として配列へ変換
                             $target_end_game_match_data_array = $target_end_game_match_data->toArray();
-                            // debug($target_end_game_match_data_array);
-                            // exit();
 
                             // 試合結果カラムに値が設定されているかどうかチェック
                             if (!empty($target_end_game_match_data_array[0]['Matchday'.$target_end_game_match_num.'Result'])) {
-                                debug($target_end_game_match_num);
-                                debug($target_end_game_match_data_array[0]['id']);
-                                debug($target_end_game_match_data_array[0]['Matchday'.$target_end_game_match_num.'ResultSumPoint']);
-
                                 // 前節の結果データをDB登録用変数へ設定
                                 for ($num = 0; $num < 18; $num++) {
                                     if ($target_results_data_array[$num]['id'] == $target_end_game_match_data_array[0]['id']) {
-                                        debug($target_results_data_array[$num]);
-
                                         // 試合数
                                         $target_results_data_array[$num]['Matchday'.$target_match_num.'Played'] = $target_end_game_match_data_array[0]['Matchday'.$target_end_game_match_num.'Played'];
                                         // ゴール数
@@ -440,8 +425,6 @@
                                         $target_results_data_array[$num]['Matchday'.$target_match_num.'GoalDifference'] = $target_end_game_match_data_array[0]['Matchday'.$target_end_game_match_num.'GoalDifference'];
                                         // 勝ち点
                                         $target_results_data_array[$num]['Matchday'.$target_match_num.'ResultSumPoint'] = $target_end_game_match_data_array[0]['Matchday'.$target_end_game_match_num.'ResultSumPoint'];
-                                        debug($target_results_data_array[$num]);
-                                        // exit();
 
                                         break;
                                     }
@@ -451,8 +434,6 @@
                         }
                     }
                 }
-                // debug($target_results_data_array);
-                // exit();
 
                 // 順位格納用変数初期化
                 $rank_num = 1;
