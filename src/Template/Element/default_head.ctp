@@ -10,7 +10,7 @@
 		<meta http-equiv="Content-Style-Type" content="text/css">
 		<meta http-equiv="Content-Script-Type" content="text/javascript">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>青い蹴球</title>
+		<title>よんにーさんいち</title>
 		<link rel="icon" type="image/x-icon" href="./Data/img/favicon.ico">
 		<!-- css 読み込み -->
 		<?php echo $this->Html->css('style'); ?>
@@ -37,10 +37,10 @@
 	<body>
 		<div id="header">
 			<div id="header_logo">
-				<a href="./" title="青い蹴球">
+				<a href="./" title="よんにーさんいち">
     				<div id="logo_wrapper">
-    					<img id="header-img1" src="<?php echo $this->Url->build("/img/logo-icon-img.png"); ?>" alt="青い蹴球 サイトロゴ" width="34px" height="31px">
-    					<span id="logo_name">青い蹴球</span>
+    					<img id="header-img1" src="<?php echo $this->Url->build("/img/logo-icon-img.png"); ?>" alt="よんにーさんいち サイトロゴ" width="34px" height="31px">
+    					<span id="logo_name">4-2-3-1</span>
     				</div>
 				</a>
 			</div>

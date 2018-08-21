@@ -70,7 +70,7 @@ h1,h2,h3,h4,h5,h6 {
 
 #logo_name {
 	font-size:150%;
-	margin: 3px 0px 0px 6px;
+	margin: 0px 0px 0px 6px;
 }
 
 #navigation_bar {
@@ -238,8 +238,8 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 .td_set1 {
-	font-size: 0.9rem;
-	font-weight: bold; /* 文字を太字 */
+	font-size: 1rem;
+	font-weight: 500; /* 文字の太さ */
 	text-align: right; /* 文字を右寄せ */
 	vertical-align: middle; /* 文字を垂直方向中央 */
 }
@@ -253,8 +253,8 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 .td_set3 {
-	font-size: 0.9rem;
-	font-weight: bold; /* 文字を太字 */
+	font-size: 1rem;
+	font-weight: 500; /* 文字の太さ */
 	text-align: left; /* 文字を右寄せ */
 	vertical-align: middle; /* 文字を垂直方向中央 */
 }
