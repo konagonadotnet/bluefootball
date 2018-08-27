@@ -12,6 +12,7 @@
     use Sunra\PhpSimple\HtmlDomParser;
     // logファイル出力のため
     use Cake\Log\Log;
+use Cake\Test\Fixture\TagsFixture;
 
     class SimpleHtmlDomController extends AppController {
 
@@ -20,7 +21,7 @@
             Log::info('J1試合日程データ取得開始', 'simple_html_dom');
 
             // URL設定
-            $url_config = Configure::read('jleagueURL', 'data'); //メモ : '配列名', 'ファイル名'
+            $url_config = Configure::read('jleagueURL', 'data'); // メモ : '配列名', 'ファイル名'
 // debug($url_config);
             foreach ($url_config as $url) {
                 // 対象URLをログへ保存
@@ -279,7 +280,10 @@
                 sleep(1);
             }
             Log::info('J1試合日程データ取得終了','simple_html_dom');
-            exit('試合日程データ登録処理終了');
+            debug('試合日程データ登録処理終了');
+            // exit('試合日程データ登録処理終了');
+
+            return true;
         }
 
         public function view()

@@ -125,6 +125,8 @@
 
         // 試合結果DB登録・更新用メソッド
         public function RegistrationMatchResults() {
+            debug('試合結果DB登録・更新開始');
+
             // 現在日時を取得
             $today = date("Y/m/d H:i");
 
@@ -529,9 +531,10 @@
             } else {
                 debug('順位データ登録処理::::失敗');
             }
-
             /**** 順位データの登録・更新処理 end ****/
 
-            exit('試合結果登録');
+            // exit('試合結果登録');
+            debug('試合結果DB登録・更新終了');
+            return true;
         }
     }
