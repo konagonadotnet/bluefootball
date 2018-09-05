@@ -14,28 +14,19 @@
 
 
     class MatchScheduleController extends AppController {
-/*
-        public $paginate = [
-            'limit' => 18,
-            'order' => [
-                'MatchSchedule.id' => 'desc'
-            ]
-        ];
 
         public function initialize() {
             parent::initialize();
-            $this->loadComponent('Paginator');
+            // JleageD1Matchdata2018テーブルを呼び出しインスタンス化
+            $this->JleageD1Matchdata2018 = TableRegistry::get('JleageD1Matchdata2018');
         }
-*/
+
         public function index() {
             // 現在日時を取得
             $today = date("Y/m/d H:i");
 
-            // Model呼び出し
-            $jleaged1matchdata2018 = TableRegistry::get('JleageD1Matchdata2018');
             // 試合日時データ取得
-            // $match_schedule_paginate_data = $this->paginate($jleaged1matchdata2018->getMatchScheduleNoArray());
-            $match_schedule_paginate_data = $jleaged1matchdata2018->getMatchScheduleNoArray();
+            $match_schedule_paginate_data = $this->JleageD1Matchdata2018->getMatchScheduleNoArray();
             if (empty($match_schedule_paginate_data)) {
                 // 試合日時データが取得できなかった場合、メッセージ表示
                 $this->Flash->error(__('日程データが取得できませんでした'));
@@ -53,7 +44,7 @@
             }
 
             // 試合日時データ取得
-            $match_schedule_settoday_data = $jleaged1matchdata2018->getMatchScheduleSetToday($today);
+            $match_schedule_settoday_data = $this->JleageD1Matchdata2018->getMatchScheduleSetToday($today);
             // 次の試合が開催される節数取得
             $target_anker_id = $match_schedule_settoday_data->first()->get('MatchNum');
 
@@ -93,9 +84,14 @@
 
                 $count_num = $count_num + 1;
             }
+
+            // 次節の試合日を取得
+            $match_schedule_nextmatchday = $this->getNextMatchDays($target_anker_id);
+
             // viewへデータを渡す
-            $this->set(compact('match_schedule_data'));
-            $this->set(compact('target_anker_id'));
+            $this->set(compact('match_schedule_data')); // 試合日程データを渡す
+            $this->set(compact('target_anker_id')); // 次節数を渡す
+            $this->set(compact('match_schedule_nextmatchday')); // 次節の試合日を渡す
         }
 
         public function getTeamName($teams_data, $teamname) {
@@ -130,4 +126,19 @@
 
             return false;
         }
+
+        // 次節の試合日を取得
+        public function getNextMatchDays($target_anker_id) {
+            // 次節指定による試合日時を取得
+            $data_nextmatchday = $this->JleageD1Matchdata2018->getNextMatchday($target_anker_id);
+            if (empty($data_nextmatchday)) {
+                // データ取得に失敗した場合、カラを設定
+                return '';
+            }
+            // 取得した試合日時をオブジェクトから連想配列に変換
+            $data_nextmatchday_array = $data_nextmatchday->toArray();
+
+            return $data_nextmatchday_array;
+        }
+
     }

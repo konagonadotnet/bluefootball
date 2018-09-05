@@ -1,4 +1,6 @@
 <?php
+    use PHP_CodeSniffer\Tokenizers\PHP;
+
     // デフォルトのレイアウトを無効
     $this->layout = false;
     // headerタグからbodyタグid="header"を呼び出し
@@ -13,7 +15,11 @@
 			</div>
 			<div id="target_anker_next_match">
 				<a href="#<?= $target_anker_id ?>">
-					<p>次戦は第<?= $target_anker_id ?>節</p>
+					<p>次戦は第<?= $target_anker_id ?>節：
+<?php foreach ($match_schedule_nextmatchday as $nextmatchday) { ?>
+						<?= $nextmatchday['MatchDay']->i18nFormat('YYYY/MM/dd').'　'; ?>
+<?php } ?>
+            		</p>
 				</a>
 			</div>
 			<div id="match_schedule_data">
@@ -91,25 +97,8 @@
 <?php
     }
 ?>
-
 			</div>
 		</div>
-<!--
-		<div class="page-load-status">
-			<p class="infinite-scroll-request">
-				<i class="fa fa-spinner fa-spin"></i>Loading...
-			</p>
-			<p class="infinite-scroll-last">End of content</p>
-			<p class="infinite-scroll-error">No more pages to load</p>
-		</div>
-		<div class="navigation">
-			<?php echo $this->Paginator->next('次のページ'); ?>
-			<?php // echo $this->Paginator->numbers(); ?>
-		</div>
-		<div hidden id="total_number_of_pages">
-			<?= $this->Paginator->params()['pageCount']; ?>
-		</div>
--->
 <?php
     // headerタグからbodyタグid="header"を呼び出し
     echo $this->element('default_footer');

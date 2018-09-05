@@ -175,6 +175,22 @@
             return $query_data;
         }
 
+        // 次節指定による試合日時を取得
+        public function getNextMatchday($next_match_num) {
+            // Select文実行
+            $query_data = $this->find()
+                ->select(['MatchDay'])
+                ->where(['MatchNum' => $next_match_num])
+                ->group(['MatchDay'])
+                ->order(['MatchDay' => 'ASC']);
+            if($query_data->count() == 0) {
+                // データが取得できなかった場合
+                return false;
+            }
+
+            return $query_data;
+        }
+
         private function checkDeta($data) {
             // データ有無チェックフラグ
             $check_id = 0;
