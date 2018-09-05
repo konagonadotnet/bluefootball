@@ -45,21 +45,4 @@
             // ログへShell実行終了メッセージ保存
             Log::info('Shell::::UpdateMatchdataShell.php::::main()::::End', 'simple_html_dom');
         }
-
-        public function JleagueHistorical() {
-            // ログへShell実行開始メッセージ保存
-            Log::info('Shell::::UpdateMatchdataShell.php:::JleagueHistorical()::::Start', 'jleague_historical_matchdata');
-
-            // 更新チェックフラグをFALSEで初期化
-            $check_flg = false;
-            // 試合日程データ登録処理の実行
-            $check_flg = $this->JleagueHistoricalMatchData->index();
-            if ($check_flg == false) {
-                Log::info('Shell::::UpdateMatchdataShell.php:::JleagueHistorical()::::Jリーグ過去シーズン試合日程データ登録処理の実行に失敗しました。処理を終了します。', 'jleague_historical_matchdata');
-                exit;
-            }
-
-            // ログへShell実行終了メッセージ保存
-            Log::info('Shell::::UpdateMatchdataShell.php::::JleagueHistorical()::::End', 'jleague_historical_matchdata');
-        }
     }

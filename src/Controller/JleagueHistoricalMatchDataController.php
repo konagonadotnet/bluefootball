@@ -220,7 +220,8 @@
             // ログへデータ取得終了メッセージ保存
             Log::info('2017シーズンJ1試合日程データ取得終了', 'jleague_historical_matchdata');
 
-            return true;
+            // 処理終了
+            exit();
         }
 
         // 試合結果DB登録・更新用メソッド
@@ -439,6 +440,7 @@
                 Log::info('2017シーズンJ1試合結果DB登録・更新処理::::失敗', 'jleague_historical_matchdata');
             }
 
+            // 処理終了
             exit();
         }
 
@@ -582,11 +584,11 @@
             }
             /**** 順位データの登録・更新処理 end ****/
 
+            // 処理終了
             exit();
         }
 
-        public function view()
-        {
+        public function view() {
             //something...
         }
 
