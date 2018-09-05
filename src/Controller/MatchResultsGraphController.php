@@ -1,6 +1,8 @@
 <?php
     namespace App\Controller;
 
+    // logファイル出力のため
+    use Cake\Log\Log;
     // configファイル使用のため
     use Cake\Core\Configure;
     // model使用のため
@@ -125,19 +127,20 @@
 
         // 試合結果DB登録・更新用メソッド
         public function RegistrationMatchResults() {
-            debug('試合結果DB登録・更新開始');
-
             // 現在日時を取得
             $today = date("Y/m/d H:i");
 
             /**** 試合結果登録・更新処理 start ****/
+            // ログへ試合結果登録・更新処理開始メッセージ保存
+            Log::info('2018シーズンJ1試合結果登録・更新処理::::Start', 'simple_html_dom');
+
             // J1試合日程データのModel呼び出し
             $jleaged1matchdata2018 = TableRegistry::get('JleageD1Matchdata2018'); // 2017-2018シーズン用テーブル
             // 試合日時データ取得
             $match_schedule_paginate_data = $jleaged1matchdata2018->getMatchScheduleNoArray();
             if (empty($match_schedule_paginate_data)) {
-                // 試合日時データが取得できなかった場合、メッセージ表示
-                $this->Flash->error(__('日程データが取得できませんでした'));
+                // ログへ試合結果登録・更新処理開始メッセージ保存
+                Log::info('2018シーズンJ1試合結果DB登録・更新処理::::日程データが取得できませんでした', 'simple_html_dom');
             }
             // 取得した試合日時データをオブジェクトから連想配列に変換
             $match_schedule_data = $match_schedule_paginate_data->toArray();
@@ -165,8 +168,8 @@
             // チーム名データ取得
             $teams_data = $jleageteams->getJleageTeams();
             if (empty($teams_data)) {
-                // チーム名データが取得できなかった場合、メッセージ表示
-                $this->Flash->error(__('チーム名が取得できませんでした'));
+                // ログへ試合結果登録・更新処理開始メッセージ保存
+                Log::info('2018シーズンJ1試合結果DB登録・更新処理::::チーム名が取得できませんでした', 'simple_html_dom');
             }
 
             // 試合結果集計データのDB登録用変数初期化
@@ -183,7 +186,10 @@
                 $match_results_data[$team['id']]['ShortTeamName'] = $team['ShortTeamName'];
 
                 // 各チームの試合データ抽出
-                $match_results_teams_data[$team['id']] = $jleaged1matchdata2018->find()->where(['HomeTeam' => $team['ShortTeamName']])->orWhere(['AwayTeam' => $team['ShortTeamName']])->all(); // HomeTeam = '鳥栖' or AwayTeam = '鳥栖'
+                $match_results_teams_data[$team['id']] = $jleaged1matchdata2018->find()
+                                                            ->where(['HomeTeam' => $team['ShortTeamName']])
+                                                            ->orWhere(['AwayTeam' => $team['ShortTeamName']])
+                                                            ->all(); // HomeTeam = '鳥栖' or AwayTeam = '鳥栖'
             }
 
             foreach ($teams_data as $team) {
@@ -311,6 +317,8 @@
                             $result_sum_score = $result_total_goal_score;
                             // 前節の総失点をDB保存用変数へ設定
                             $result_sum_lost_score = $result_total_lost_score;
+                            // 得失点差を集計しDB保存用変数へ設定
+                            $result_sum_goal_difference = $result_sum_score - $result_sum_lost_score;
                         }
                     }
 
@@ -350,16 +358,21 @@
             $jleaged1matchresults2018 = TableRegistry::get('JleageD1MatchResults2018');
             // データ登録
             $jleaged1matchresults2018->registerResutlsData($match_results_data);
+
+            // ログへ試合結果登録・更新処理開始メッセージ保存
+            Log::info('2018シーズンJ1試合結果登録・更新処理::::End', 'simple_html_dom');
             /**** 試合結果登録・更新処理 end ****/
 
             /**** 順位データの登録・更新処理 start ****/
+            // ログへ試合結果登録・更新処理開始メッセージ保存
+            Log::info('2018シーズンJ1順位データの登録・更新処理::::Start', 'simple_html_dom');
+
             // DB保存用順位を含めたチームデータ格納用配列初期化
             $rank_data = array();
             // 節数指定変数初期化
             $target_match_num = 0;
             // 各節ごとに順位を登録・更新
             for ($target_match_num = 1; $target_match_num <= $target_end_match_num; $target_match_num++) {
-// $target_match_num = 18;
                 // 各節ごとの試合結果データを取得
                 $target_results_data = $jleaged1matchresults2018->find()
                     ->select([
@@ -459,7 +472,8 @@
                                 }
                         }
                     } else {
-                        debug('TeamID = '.$results_data['id'].'::::MatchNum = '.$target_match_num.'::::Rankデータ決定条件1:勝ち点をチェックのデータ異常');
+                        // 順位決定条件1:勝ち点をチェック失敗メッセージ保存
+                        Log::info('2018シーズンJ1順位データの登録・更新処理::::Rankデータ決定条件1:勝ち点をチェックのデータ異常::::TeamID = '.$results_data['id'].'::::MatchNum = '.$target_match_num, 'simple_html_dom');
                     }
 
                     // 順位決定条件2:得失点差をチェック
@@ -486,7 +500,6 @@
                     }
 
                     // 順位決定条件4:当該チーム間の対戦成績（イ：勝点、ロ：得失点差、ハ：総得点数）をチェック(未実装:現在は同率順位で設定)
-                    // debug($rank_num);
                     if (!empty($results_data_condition3)) {
 
                         if (!empty($rank_data['Matchday'.$target_match_num])) {
@@ -521,20 +534,18 @@
                     }
                 }
             }
-            // debug($rank_data);
-            // exit();
 
             // 順位データ登録
             $rank_data_update_result = $jleaged1matchresults2018->registerRankData($rank_data);
             if ($rank_data_update_result == true) {
-                debug('順位データ登録処理::::正常終了');
+                // ログへ順位データ登録・更新処理完了メッセージ保存
+                Log::info('2018シーズンJ1順位データの登録・更新処理::::End', 'simple_html_dom');
             } else {
-                debug('順位データ登録処理::::失敗');
+                // ログへ順位データ登録・更新処理失敗メッセージ保存
+                Log::info('2018シーズンJ1順位データの登録・更新処理::::FALSE::::End', 'simple_html_dom');
             }
             /**** 順位データの登録・更新処理 end ****/
 
-            // exit('試合結果登録');
-            debug('試合結果DB登録・更新終了');
             return true;
         }
     }

@@ -12,27 +12,23 @@
     use Sunra\PhpSimple\HtmlDomParser;
     // logファイル出力のため
     use Cake\Log\Log;
-use Cake\Test\Fixture\TagsFixture;
 
     class SimpleHtmlDomController extends AppController {
 
         public function index() {
-            debug('試合日程データ登録処理開始');
-            Log::info('J1試合日程データ取得開始', 'simple_html_dom');
+            // ログへデータ取得開始メッセージ保存
+            Log::info('2018シーズンJ1試合日程データ取得開始', 'simple_html_dom');
 
             // URL設定
             $url_config = Configure::read('jleagueURL', 'data'); // メモ : '配列名', 'ファイル名'
-// debug($url_config);
             foreach ($url_config as $url) {
                 // 対象URLをログへ保存
                 Log::info('$url = '.$url, 'simple_html_dom');
 
                 // 試合データ格納用配列初期化
                 $data = array();
-
                 // URL先からhtml取得
                 $html = @file_get_contents($url);
-// var_dump($html);
                 if (empty($html)) {
                     // ログへメッセージ保存
                     Log::info('URL先からhtml取得::::FALSE ($html)', 'simple_html_dom');
@@ -43,7 +39,6 @@ use Cake\Test\Fixture\TagsFixture;
 
                 // 取得したhtmlをHtmlDomParserへ設定
                 $dom = HtmlDomParser::str_get_html($html);
-// var_dump($dom);
                 if (empty($dom)) {
                     // ログへメッセージ保存
                     Log::info('取得したhtmlをHtmlDomParserへ設定::::FALSE $dom', 'simple_html_dom');
@@ -53,7 +48,6 @@ use Cake\Test\Fixture\TagsFixture;
                 preg_match('/j[0-9]/', $url, $division_num); // 'j1'、'j2' or 'j3'の文字列取得
                 // 文字列'j'削除し数字のみ取得
                 $division = str_replace('j', '', $division_num[0]);
-// debug($division);
                 if (empty($division)) {
                     // ログへメッセージ保存
                     Log::info('URLからディビジョン取得::::FALSE $division', 'simple_html_dom');
@@ -63,7 +57,6 @@ use Cake\Test\Fixture\TagsFixture;
                 $result_match_num_data = $dom->find('#breadcrumbList h1', 0);
                 // 数字以外は削除
                 $result_match_num = preg_replace('/[^0-9]/', '', $result_match_num_data->plaintext);
-// echo $result_match_num.'<br>';
                 if (empty($result_match_num_data) || empty($result_match_num)) {
                     // ログへメッセージ保存
                     Log::info('節数取得::::FALSE $result_match_num', 'simple_html_dom');
@@ -71,13 +64,12 @@ use Cake\Test\Fixture\TagsFixture;
 
                 // リーグ名&節数取得
                 $result_title = $dom->find('.ttlLink h3', 0);
-// echo $result_title->plaintext.'<br>';
                 if (empty($result_title)) {
                     // ログへメッセージ保存
                     Log::info('リーグ名&節数取得::::FALSE $result_title->plaintext', 'simple_html_dom');
                 }
 
-                // 各データ取得
+                // 詳細データ取得
                 $result = $dom->find('.matchlistWrap');
                 if (empty($result)) {
                     // ログへメッセージ保存
@@ -93,25 +85,23 @@ use Cake\Test\Fixture\TagsFixture;
                         // ログへメッセージ保存
                         Log::info('試合日の取得::::FALSE $result_matchday', 'simple_html_dom');
                     }
-// echo $result_matchday->plaintext.'<br>';
 
                     // 試合日から曜日削除
                     $cut = 3; // カットしたい文字数設定 : 「(月)」を削除するため
-                    $matchday_replace = mb_substr( $result_matchday->plaintext , 0 , mb_strlen($result_matchday->plaintext)-$cut ); // 2018年2月23日(金) → 2018年2月23日を抽出
-// debug($matchday_replace);
-
+                    // 後ろ3文字削除
+                    $matchday_replace = mb_substr( $result_matchday->plaintext , 0 , mb_strlen($result_matchday->plaintext) - $cut); // 2018年2月23日(金) → 2018年2月23日を抽出
+                    // DateTime型へ変換
                     $matchday_date = DateTime::createFromFormat('Y年m月d日', $matchday_replace);
-// debug($matchday_date);
                     if (empty($matchday_date)){
                         // ログへメッセージ保存
-                        Log::info('試合日から曜日削除::::FALSE $matchday_date', 'simple_html_dom');
+                        Log::info('試合日から曜日削除、該当データの登録処理をスキップ::::FALSE $matchday_date', 'simple_html_dom');
 
                         // 日付データが存在しない場合、詳細データ抽出を途中で終了し該当データの登録は行わない(スキップ)
                         break;
                     }
 
+                    // DateTime型のフォーマットをYmdへ変換
                     $matchday_key = $matchday_date->format('Ymd');
-// debug($matchday_key);
                     // 試合開始時刻とスタジアム名(略称)の取得
                     $result_time_stadium = $element->find('.stadium');
                     if (!empty($result_time_stadium)) {
@@ -122,7 +112,6 @@ use Cake\Test\Fixture\TagsFixture;
                         foreach($result_time_stadium as $element_time_stadium){
                             // 一意となるようid作成
                             $key = $matchday_key.$time_stadium_key_id;
-// debug($key);
                             // 試合開始時刻と略称のスタジアム名を改行コードで分割し配列へ格納
                             $time_stadium_explode = explode("\r\n",$element_time_stadium->plaintext); // [0]:試合開始時刻、[1]:略称のスタジアム名
                             // 分割した試合開始時刻と略称のスタジアム名を成形
@@ -145,7 +134,6 @@ use Cake\Test\Fixture\TagsFixture;
 
                             $date = new DateTime();
                             $date->setTimezone(new DateTimeZone('Asia/Tokyo'));
-// debug($date->getTimezone());
 
                             // 試合開始日格納用変数初期化
                             $matchday_format = null;
@@ -157,8 +145,6 @@ use Cake\Test\Fixture\TagsFixture;
                                 $matchday_format = $matchdaytime->format('Y-m-d');
                                 $matchdaytime_format = $matchdaytime->format('Y-m-d H:i:s');
                             }
-// debug($matchday_format);
-// debug($matchdaytime_format);
 
                             // 試合データ格納用配列へ格納
                             $data[$key] = array(
@@ -173,8 +159,6 @@ use Cake\Test\Fixture\TagsFixture;
                         // ログへメッセージ保存
                         Log::info('試合開始時刻とスタジアム名(略称)の取得::::FALSE $result_time_stadium', 'simple_html_dom');
                     }
-// debug($time_stadium);
-// debug($data);
 
                     // HOMEとAWAYのチーム名取得
                     $result_team_names = $element->find('.clubName'); // clubName leftside
@@ -190,7 +174,6 @@ use Cake\Test\Fixture\TagsFixture;
                             // チーム名格納用配列へ格納
                             $team_names['team_names'][] = $tmp_team_names;
                         }
-// debug($team_names);
 
                         // id設定用変数を初期化
                         $home_team_key = 1;
@@ -218,7 +201,7 @@ use Cake\Test\Fixture\TagsFixture;
                         // ログへメッセージ保存
                         Log::info('HOMEとAWAYのチーム名取得::::FALSE $result_time_stadium', 'simple_html_dom');
                     }
-// debug($data);
+
                     // HOMEとAWAYの得点取得
                     $result_point = $element->find('.point'); // point leftside
                     if (!empty($result_point)) {
@@ -227,7 +210,7 @@ use Cake\Test\Fixture\TagsFixture;
                         foreach($result_point as $element_point){
                             $point[] = trim($element_point->plaintext);
                         }
-// debug($point);
+
                         // id設定用変数を初期化
                         $point_home_team_key = 1;
                         $point_away_team_key = 1;
@@ -260,13 +243,11 @@ use Cake\Test\Fixture\TagsFixture;
 
                 // 試合データ格納用配列のキー値を取得
                 $data_key = array_keys($data);
-// debug($data_key);
                 // ディビジョンと節数を設定
                 foreach ($data_key as $element_key) {
                     $data[$element_key] = array_merge($data[$element_key], array('Division' => $division));
                     $data[$element_key] = array_merge($data[$element_key], array('MatchNum' => $result_match_num));
                 }
-// debug($data);
 
                 // HtmlDomParserを開放
                 $dom->clear();
@@ -275,13 +256,13 @@ use Cake\Test\Fixture\TagsFixture;
                 // Model呼び出しのため
                 $jleaged1matchdata2018 = TableRegistry::get('JleageD1Matchdata2018'); // 2017-2018シーズン用テーブル
                 // データ保存
-                $jleaged1matchdata2018->registerData($data_key, $data);
+                $jleaged1matchdata2018->registerData($data);
                 // 1秒待機
                 sleep(1);
             }
-            Log::info('J1試合日程データ取得終了','simple_html_dom');
-            debug('試合日程データ登録処理終了');
-            // exit('試合日程データ登録処理終了');
+
+            // ログへデータ取得終了メッセージ保存
+            Log::info('2018シーズンJ1試合日程データ取得終了','simple_html_dom');
 
             return true;
         }

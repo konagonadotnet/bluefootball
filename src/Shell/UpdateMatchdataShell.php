@@ -7,6 +7,7 @@
 
     use Cake\ORM\TableRegistry;
     use App\Controller\SimpleHtmlDomController;
+    use App\Controller\JleagueHistoricalMatchDataController;
     use App\Controller\MatchResultsGraphController;
 
     class UpdateMatchdataShell extends Shell {
@@ -15,15 +16,16 @@
         {
             parent::initialize();
             $this->SimpleHtmlDom = new SimpleHtmlDomController();
+            $this->JleagueHistoricalMatchData = new JleagueHistoricalMatchDataController();
             $this->MatchResultsGraph = new MatchResultsGraphController();
         }
 
         public function main() {
-            debug('Shell::::UpdateMatchdataShell.php:::main()::::Start');
+            // ログへShell実行開始メッセージ保存
+            Log::info('Shell::::UpdateMatchdataShell.php:::main()::::Start', 'simple_html_dom');
 
             // 更新チェックフラグをFALSEで初期化
             $check_flg = false;
-
             // 試合日程データ登録処理の実行
             $check_flg = $this->SimpleHtmlDom->index();
             if ($check_flg == false) {
@@ -40,6 +42,24 @@
                 exit;
             }
 
-            debug('Shell::::UpdateMatchdataShell.php::::main()::::End');
+            // ログへShell実行終了メッセージ保存
+            Log::info('Shell::::UpdateMatchdataShell.php::::main()::::End', 'simple_html_dom');
+        }
+
+        public function JleagueHistorical() {
+            // ログへShell実行開始メッセージ保存
+            Log::info('Shell::::UpdateMatchdataShell.php:::JleagueHistorical()::::Start', 'jleague_historical_matchdata');
+
+            // 更新チェックフラグをFALSEで初期化
+            $check_flg = false;
+            // 試合日程データ登録処理の実行
+            $check_flg = $this->JleagueHistoricalMatchData->index();
+            if ($check_flg == false) {
+                Log::info('Shell::::UpdateMatchdataShell.php:::JleagueHistorical()::::Jリーグ過去シーズン試合日程データ登録処理の実行に失敗しました。処理を終了します。', 'jleague_historical_matchdata');
+                exit;
+            }
+
+            // ログへShell実行終了メッセージ保存
+            Log::info('Shell::::UpdateMatchdataShell.php::::JleagueHistorical()::::End', 'jleague_historical_matchdata');
         }
     }

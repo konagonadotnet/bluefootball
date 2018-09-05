@@ -22,7 +22,7 @@
 			</div>
 			<table>
 				<tr>
-					<th>順位</th><th>クラブ</th><th>試合数</th><th>ゴール数</th><th>失点数</th><th>得失点差</th><th>勝ち点</th>
+					<th>順位</th><th>クラブ</th><th>勝ち点</th><th>試合数</th><th>ゴール数</th><th>失点数</th><th>得失点差</th>
 				</tr>
 <?php
     // 順位設定変数初期化
@@ -32,11 +32,11 @@
 				<tr>
 					<td><?php echo $rank; // 順位 ?></td>
 					<td><?php echo $data->TeamName; // クラブ名 ?></td>
+					<td><?php echo $data->$table_data_key_name_resultsumpoint; // 勝ち点 ?></td>
 					<td><?php echo $data->$table_data_key_name_played; // 総試合数 ?></td>
 					<td><?php echo $data->$table_data_key_name_totalgoalscore; // 総ゴール数 ?></td>
 					<td><?php echo $data->$table_data_key_name_totallostgoalscore; // 総失点数 ?></td>
 					<td><?php echo $data->$table_data_key_name_goaldifference; // 得失点差 ?></td>
-					<td><?php echo $data->$table_data_key_name_resultsumpoint; // 勝ち点 ?></td>
 				</tr>
 <?php
         // 順位を昇順に表示するため+1

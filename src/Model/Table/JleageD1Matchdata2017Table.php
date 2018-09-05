@@ -5,43 +5,47 @@
     // logファイル出力のため
     use Cake\Log\Log;
 
-    class JleageD1Matchdata2018Table extends Table {
+    class JleageD1Matchdata2017Table extends Table {
         public function initialize(array $config)
         {
-            $this->setTable('jleage_d1_matchdata2018');
+            $this->setTable('jleage_d1_matchdata2017');
             $this->setPrimaryKey('id');
         }
 
-        public function registerData($data) {
+        public function registerData($jleaguehistoricalmatchdata) {
             // ログへ登録処理開始メッセージ保存
-            Log::info('2018シーズンJ1試合日程データ登録処理::::Start', 'simple_html_dom');
+            Log::info('2017シーズンJ1試合日程データ登録処理::::Start', 'jleague_historical_matchdata');
+            // debug($jleaguehistoricalmatchdata);
 
             // 1件ずつデータをチェックし保存
-            foreach($data as $element_data) {
+            foreach($jleaguehistoricalmatchdata as $historical_data) {
                 // データチェック
-                $check_id = $this->checkDeta($element_data); // $check_id:0(新規)、0以外(既に存在)
+                $check_id = $this->checkDeta($historical_data); // $check_id:0(新規)、0以外(既に存在)
+                // debug($check_id);
+                // exit();
+
                 if ($check_id == 0) { // 新規登録
                     // ログへメッセージ保存
-                    Log::info('DBのデータ存在チェック::::データが存在しません。新規登録開始 $check_id = '.$check_id, 'simple_html_dom');
+                    Log::info('DBのデータ存在チェック::::データが存在しません。新規登録開始 $check_id = '.$check_id, 'jleague_historical_matchdata');
 
                     // データの検証 (バリデーション)
-                    $save_data = $this->newEntity($element_data);
+                    $save_data = $this->newEntity($historical_data);
                     // データが存在しない場合、DBへ保存
                     $this->save($save_data);
 
                     if ($this->save($save_data)) {
-                        // 登録結果をログへ保存
-                        Log::info('DBのデータ存在チェック::::新規登録成功', 'simple_html_dom');
+                        // 正常に保存された場合、登録結果をログへ保存
+                        Log::info('DBのデータ存在チェック::::新規登録成功', 'jleague_historical_matchdata');
                     } else {
-                        // 登録結果をログへ保存
-                        Log::info('DBのデータ存在チェック::::新規登録失敗', 'simple_html_dom');
+                        // 保存に失敗した場合、結果をログへ保存
+                        Log::info('DBのデータ存在チェック::::新規登録失敗', 'jleague_historical_matchdata');
                     }
                 } else { // データ比較、更新
                     // ログへメッセージ保存
-                    Log::info('DBのデータ存在チェック::::データはすでに存在します。DBとの比較開始 $check_id = '.$check_id, 'simple_html_dom');
+                    Log::info('DBのデータ存在チェック::::データはすでに存在します。DBとの比較開始 $check_id = '.$check_id, 'jleague_historical_matchdata');
 
                     // データが存在する場合、$idからエンティティーを取得
-                    $query_matchdata = $this->get($check_id); // データがなければ、NotFoundExceptionが投げられる。
+                    $query_matchdata = $this->get($check_id); // データがなければ、NotFoundExceptionが投げられる
                     // objectから配列へ変換
                     $query_matchdata_array = $query_matchdata->toArray();
 
@@ -67,40 +71,40 @@
                         $matchday_time_data = $query_matchdata_array['MatchDayTime'];
                     }
 
-                    // Webページから取得したデータとDBから取得した値を比較
-                    if ($element_data['MatchDay'] != $matchday_data
-                        || $element_data['MatchDayTime'] != $matchday_time_data
-                        || $element_data['ShortStadiumName'] != $query_matchdata_array['ShortStadiumName']
-                        || $element_data['HomeTeam'] != $query_matchdata_array['HomeTeam']
-                        || $element_data['AwayTeam'] != $query_matchdata_array['AwayTeam']
-                        || $element_data['HomeGetPoint'] != $query_matchdata_array['HomeGetPoint']
-                        || $element_data['AwayGetPoint'] != $query_matchdata_array['AwayGetPoint']
-                        || $element_data['Division'] != $query_matchdata_array['Division']
-                        || $element_data['MatchNum'] != $query_matchdata_array['MatchNum']
+                    // 公式ページから取得したデータとDBから取得した値を比較
+                    if ($historical_data['MatchDay'] != $matchday_data
+                        || $historical_data['MatchDayTime'] != $matchday_time_data
+                        || $historical_data['ShortStadiumName'] != $query_matchdata_array['ShortStadiumName']
+                        || $historical_data['HomeTeam'] != $query_matchdata_array['HomeTeam']
+                        || $historical_data['AwayTeam'] != $query_matchdata_array['AwayTeam']
+                        || $historical_data['HomeGetPoint'] != $query_matchdata_array['HomeGetPoint']
+                        || $historical_data['AwayGetPoint'] != $query_matchdata_array['AwayGetPoint']
+                        || $historical_data['Division'] != $query_matchdata_array['Division']
+                        || $historical_data['MatchNum'] != $query_matchdata_array['MatchNum']
                         ) {
-                            // 比較結果をログへ保存
-                            Log::info('Webページから取得したデータとDBから取得した値を比較::::データが異なります', 'simple_html_dom');
+                            // 値が1つでも異なる場合、比較結果をログへ保存
+                            Log::info('Webページから取得したデータとDBから取得した値を比較::::データが異なります', 'jleague_historical_matchdata');
 
                             // POSTされたリクエストデータを、バリデーションして、エンティティーにマージ
-                            $this->patchEntity($query_matchdata, $element_data);
-                            // DBへ上書き保存
+                            $this->patchEntity($query_matchdata, $historical_data);
+                            // 値が1つでも異なる場合、DBへ上書き保存
                             if ($this->save($query_matchdata)) {
                                 // 保存成功した場合、メッセージをログへ保存
-                                Log::info('Webページから取得したデータとDBから取得した値を比較::::データの上書き成功 $check_id = '.$check_id, 'simple_html_dom');
+                                Log::info('Webページから取得したデータとDBから取得した値を比較::::データの上書き成功 $check_id = '.$check_id, 'jleague_historical_matchdata');
                             } else {
                                 // 保存失敗した場合、メッセージをログへ保存
-                                Log::info('Webページから取得したデータとDBから取得した値を比較::::データの上書き失敗 $check_id = '.$check_id, 'simple_html_dom');
+                                Log::info('Webページから取得したデータとDBから取得した値を比較::::データの上書き失敗 $check_id = '.$check_id, 'jleague_historical_matchdata');
                             }
                     } else {
                         // 比較結果をログへ保存
-                        Log::info('Webページから取得したデータとDBから取得した値を比較::::データは同じため登録処理をスキップ $check_id = '.$check_id, 'simple_html_dom');
+                        Log::info('Webページから取得したデータとDBから取得した値を比較::::データは同じため登録処理をスキップ $check_id = '.$check_id, 'jleague_historical_matchdata');
                     }
                     // ログへメッセージ保存
-                    Log::info('DBのデータ存在チェック::::データはすでに存在します。DBとの比較終了 $check_id = '.$check_id, 'simple_html_dom');
+                    Log::info('DBのデータ存在チェック::::データはすでに存在します。DBとの比較終了 $check_id = '.$check_id, 'jleague_historical_matchdata');
                 }
             }
             // ログへメッセージ保存
-            Log::info('2018シーズンJ1試合日程データ登録処理::::End', 'simple_html_dom');
+            Log::info('2018シーズンJ1試合日程データ登録処理::::End', 'jleague_historical_matchdata');
         }
 
         public function getMatchSchedule() {
@@ -176,7 +180,7 @@
         }
 
         private function checkDeta($data) {
-            // データ有無チェックフラグ
+            // データ有無チェックフラグを初期化
             $check_id = 0;
 
             // Select文実行
