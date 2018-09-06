@@ -145,30 +145,42 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 #target_anker_next_match {
-	background-color: #FFFFFF;
+	text-align: center;
+	font-weight: bold;
 }
 
-#target_anker_next_match p {
-	margin: 5px 0px 10px 0px;
-	padding: 3px 3px 3px 3px;
-
-	font-weight: bold;
-	text-align: center;
-
-	border-color : #C0C0C0;
-	border-width : 1px;
-	border-style : solid;
-
-	border-top-left-radius: 5px;
-  	border-top-right-radius: 5px;
-	border-bottom-right-radius: 5px;
-	border-bottom-left-radius: 5px;
+#target_anker_next_match .jumpbutton {
+	display: inline-block;
+	padding: .6em .6em .6em 3em;
+	margin: 0 0 1em;
+	position: relative;
+	background: #4169e1;
+	font-size: 12.5px;
+	border: .1875em solid #FFFFFF;
+	border-radius: 0px;
+	cursor: pointer;
+}
+#target_anker_next_match .jumpbutton::before {
+	position: absolute;
+	content: '\f103'; /*アイコンのユニコード*/
+	font-family: 'Font Awesome 5 Free';
+	font-size: 1.6em; /*サイズ*/
+	top: 50%;
+	right: auto;
+	left: .4em;
+	bottom: auto;
+	transform: translateY(-50%);
+}
+#target_anker_next_match .jumpbutton:hover {
+	color: #4169e1;
+	background: #FFFFFF;
+	border-color: #4169e1;
 }
 #target_anker_next_match a:link {
-	color: #4169e1; /* リンクの文字色 */
+	color: #FFFFFF; /* リンクの文字色 */
 }
 #target_anker_next_match a:hover {
-	text-decoration: underline;
+	color: #222; /* リンクの文字色 */
 }
 
 .matchday_contents {
@@ -199,7 +211,7 @@ h1,h2,h3,h4,h5,h6 {
 
 .match_day h5 {
 	font-size: 110%;
-	padding: 0.3rem 0 0 1.5rem; /*アイコン分のスペース*/
+	padding: 0.4rem 0 0 1.5rem; /*アイコン分のスペース*/
 	margin:0 0 0.2rem 0;
 	line-height: 1.5; /* 行の高さ */
 	position: relative; /* 相対位置 */

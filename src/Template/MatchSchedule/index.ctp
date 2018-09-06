@@ -13,15 +13,22 @@
 			<div class="title">
 				<h1>J1リーグ 2018シーズン | 日程・結果</h1>
 			</div>
+
+
+			<div class="match_day">
+					<h5><span>Next Match</span></h5>
+			</div>
+
 			<div id="target_anker_next_match">
-				<a href="#<?= $target_anker_id ?>">
-					<p>次戦は第<?= $target_anker_id ?>節：
+				<a class="jumpbutton" href="#<?= $target_anker_id ?>">
+					<span>第<?= $target_anker_id ?>節<br>
 <?php foreach ($match_schedule_nextmatchday as $nextmatchday) { ?>
 						<?= $nextmatchday['MatchDay']->i18nFormat('YYYY/MM/dd').'　'; ?>
 <?php } ?>
-            		</p>
+            		</span>
 				</a>
 			</div>
+
 			<div id="match_schedule_data">
 				<?= $this->Flash->render() ?>
 
