@@ -19,7 +19,7 @@
                 $team_results_data = $this->getTeamResutls($query_data['id']);
                 if (empty($team_results_data)) {
                     // ログへ試合結果データ取得失敗メッセージ保存
-                    Log::info('2018シーズンJ1試合結果データ取得処理::::False::::: id = '.$query_data['id'], 'jleague_historical_matchdata');
+                    Log::info('2017シーズンJ1試合結果データ取得処理::::False::::: id = '.$query_data['id'], 'jleague_historical_matchdata');
 
                     // データ取得に失敗した場合、スキップ
                     continue;
@@ -184,6 +184,8 @@
                     }
                 }
             }
+            // ログへ順位データ登録・更新処理終了メッセージ保存
+            Log::info('2017シーズンJ1順位データ登録・更新処理:::::End', 'jleague_historical_matchdata');
 
             // update処理が終了した場合、tureを返す
             return true;

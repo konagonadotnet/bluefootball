@@ -36,7 +36,9 @@ return [
         '32'=>'https://www.jleague.jp/match/section/j1/33/',
         '33'=>'https://www.jleague.jp/match/section/j1/34/',
     ),
-    'j1league2017URL' => array(
-        '0'=>'https://www.jleague.jp/special/match/2017/j1.html',
-    )
+    '2017' => array(
+        'j1league2017URL' => array(
+            '0'=>'https://www.jleague.jp/special/match/2017/j1.html',
+        )
+    ),
 ];

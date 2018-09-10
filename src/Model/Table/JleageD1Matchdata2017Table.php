@@ -15,15 +15,11 @@
         public function registerData($jleaguehistoricalmatchdata) {
             // ログへ登録処理開始メッセージ保存
             Log::info('2017シーズンJ1試合日程データ登録処理::::Start', 'jleague_historical_matchdata');
-            // debug($jleaguehistoricalmatchdata);
 
             // 1件ずつデータをチェックし保存
             foreach($jleaguehistoricalmatchdata as $historical_data) {
                 // データチェック
                 $check_id = $this->checkDeta($historical_data); // $check_id:0(新規)、0以外(既に存在)
-                // debug($check_id);
-                // exit();
-
                 if ($check_id == 0) { // 新規登録
                     // ログへメッセージ保存
                     Log::info('DBのデータ存在チェック::::データが存在しません。新規登録開始 $check_id = '.$check_id, 'jleague_historical_matchdata');
@@ -104,7 +100,7 @@
                 }
             }
             // ログへメッセージ保存
-            Log::info('2018シーズンJ1試合日程データ登録処理::::End', 'jleague_historical_matchdata');
+            Log::info('2017シーズンJ1試合日程データ登録処理::::End', 'jleague_historical_matchdata');
         }
 
         public function getMatchSchedule() {
