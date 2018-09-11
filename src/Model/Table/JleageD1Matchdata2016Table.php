@@ -5,16 +5,16 @@
     // logファイル出力のため
     use Cake\Log\Log;
 
-    class JleageD1Matchdata2017Table extends Table {
+    class JleageD1Matchdata2016Table extends Table {
         public function initialize(array $config)
         {
-            $this->setTable('jleage_d1_matchdata2017');
+            $this->setTable('jleage_d1_matchdata2016');
             $this->setPrimaryKey('id');
         }
 
         /*
-         * idカラム値指定によるデータ取得クエリ実行メソッド
-         */
+        * idカラム値指定によるデータ取得クエリ実行メソッド
+        */
         public function getTableData($id) {
             // idによるデータ取得
             $query_data = $this->get($id);
@@ -32,12 +32,12 @@
 
             // Select文実行
             $query_data = $this->find()
-            ->select(['id'])
-            ->where(['Division' => $data['Division']])
-            ->where(['MatchNum' => $data['MatchNum']])
-            ->where(['HomeTeam' => $data['HomeTeam']])
-            ->where(['AwayTeam' => $data['AwayTeam']])
-            ->all();
+                ->select(['id'])
+                ->where(['Division' => $data['Division']])
+                ->where(['MatchNum' => $data['MatchNum']])
+                ->where(['HomeTeam' => $data['HomeTeam']])
+                ->where(['AwayTeam' => $data['AwayTeam']])
+                ->all();
 
             // 取得したデータ件数により有無を判定
             if($query_data->count() != 0) {

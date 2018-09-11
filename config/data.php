@@ -41,4 +41,9 @@ return [
             '0'=>'https://www.jleague.jp/special/match/2017/j1.html',
         )
     ),
+    '2016' => array(
+        'j1league2016URL' => array(
+            '0'=>'https://www.jleague.jp/special/match/2016/j1.html',
+        )
+    ),
 ];

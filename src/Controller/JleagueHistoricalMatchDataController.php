@@ -16,7 +16,8 @@
     class JleagueHistoricalMatchDataController extends AppController {
         public function initialize(){
             // シーズン選択
-            $this->season_year = 2017;
+            // $this->season_year = 2017;
+            $this->season_year = 2016;
 
             // configファイル、Table呼び出し用設定値を設定
             if ($this->season_year == 2017) {
@@ -27,6 +28,16 @@
                     'TableMatchdata' => 'JleageD1Matchdata2017',
                     'TableMatchResults' => 'JleageD1MatchResults2017',
                     'DataMaxNum' => 60, // htmlからのデータ取得箇所数の設定値
+                );
+            }
+            if ($this->season_year == 2016) {
+                $this->conf_val = array(
+                    'season' => 2016,
+                    'category' => 'j1',
+                    'url' => 'j1league2016URL',
+                    'TableMatchdata' => 'JleageD1Matchdata2016',
+                    'TableMatchResults' => 'JleageD1MatchResults2016',
+                    'DataMaxNum' => 46, // htmlからのデータ取得箇所数の設定値
                 );
             }
         }
@@ -110,11 +121,47 @@
 
                 // 節数取得
                 $result_match_num_data = $dom->find('.leagAccTit h5', $data_num);
-                // 半角数字以外は削除
-                $result_match_num = preg_replace('/[^0-9]/', '', $result_match_num_data->plaintext);
-                if (empty($result_match_num_data) || empty($result_match_num)) {
+                if (empty($result_match_num_data)) {
                     // ログへメッセージ保存
                     Log::info('節数取得::::FALSE $result_match_num', 'jleague_historical_matchdata');
+                    // 節数取得失敗の場合、スキップ
+                    break;
+                }
+
+                $result_match_num = null;
+                // 半角数字以外は削除
+                if ($this->season_year == 2017) { // 2017シーズンの場合、半角数字以外は削除し節数を格納
+                    $result_match_num = preg_replace('/[^0-9]/', '', $result_match_num_data->plaintext);
+                } else if ($this->season_year == 2016) { // 2016シーズンの場合、ステージ数(1st or 2nd)を判定し節数を格納
+                    // 区切り文字をスペースとして配列に変換する変数初期化
+                    $table_stage_num_array = array();
+
+                    // 全角英数字を半角英数字へ変換
+                    $table_stage_num_plaintext = mb_convert_kana($result_match_num_data->plaintext,'a');
+                    // 全角スペースを半角スペースへ変換
+                    $table_stage_num_plaintext = preg_replace('/　/', ' ', $table_stage_num_plaintext);
+                    // 区切り文字をスペースとして配列へ変換
+                    $table_stage_num_array = explode(" ", $table_stage_num_plaintext);
+
+                    // ステージ数をを判定
+                    if ($table_stage_num_array[1] == '1stステージ') {
+                        // 半角数字以外は削除し節数を設定
+                        $result_match_num = preg_replace('/[^0-9]/', '', $table_stage_num_array[2]);
+                    } else if ($table_stage_num_array[1] == '2ndステージ'){
+                        // 半角数字以外は削除し節数を設定
+                        $result_match_num = 17;
+                        $result_match_num = $result_match_num + preg_replace('/[^0-9]/', '', $table_stage_num_array[2]);
+                    } else {
+                        // ログへメッセージ保存
+                        Log::info('ステージ数取得::::FALSE $table_stage_num_array', 'jleague_historical_matchdata');
+                    }
+                }
+                // 節数取得の確認
+                if (empty($result_match_num)) {
+                    // ログへメッセージ保存
+                    Log::info('節数取得::::FALSE $result_match_num', 'jleague_historical_matchdata');
+                    // 節数取得失敗の場合、スキップ
+                    break;
                 }
 
                 // 試合詳細データ取得
@@ -230,10 +277,105 @@
             // ログへメッセージ保存
             Log::info($this->conf_val['season'].'シーズン'.$this->conf_val['category'].'試合日程データ登録・更新準備完了', 'jleague_historical_matchdata');
 
-            // Model呼び出し
-            $jleagedmatchdata = TableRegistry::get($this->conf_val['TableMatchdata']);
-            // データ保存
-            $jleagedmatchdata->registerData($jleaguehistoricalmatchdata);
+            // 登録・更新処理開始
+            if ($this->season_year == 2016 || $this->season_year == 2017) {
+                // ログへ登録処理開始メッセージ保存
+                Log::info($this->conf_val['season'].'シーズン'.$this->conf_val['category'].'試合日程データ登録処理::::Start', 'jleague_historical_matchdata');
+
+                // Model呼び出し
+                $jleagedmatchdata = TableRegistry::get($this->conf_val['TableMatchdata']);
+
+                // 1件ずつデータをチェックし保存
+                foreach($jleaguehistoricalmatchdata as $historical_data) {
+                    // データチェック
+                    $check_id = $jleagedmatchdata->checkDeta($historical_data); // $check_id:0(新規)、0以外(既に存在)
+
+                    // 新規登録 or 更新の判定
+                    if ($check_id == 0) { // 新規登録
+                        // ログへメッセージ保存
+                        Log::info('DBのデータ存在チェック::::データが存在しません。新規登録開始 $check_id = '.$check_id, 'jleague_historical_matchdata');
+
+                        $table_save_flg = false; // 初期化
+                        // 登録を実行
+                        $table_save_flg = $jleagedmatchdata->saveNewData($historical_data);
+                        if ($table_save_flg == false) {
+                            // 保存に失敗した場合、結果をログへ保存
+                            Log::info('DBのデータ存在チェック::::新規登録失敗::::$historical_data = '.print_r($historical_data, true), 'jleague_historical_matchdata');
+                        } else {
+                            // 正常に保存された場合、登録結果をログへ保存
+                            Log::info('DBのデータ存在チェック::::新規登録成功::::$check_id = '.$table_save_flg, 'jleague_historical_matchdata');
+                        }
+                    } else { // データ比較、更新
+                        // ログへメッセージ保存
+                        Log::info('DBのデータ存在チェック::::データはすでに存在します。DBとの比較開始 $check_id = '.$check_id, 'jleague_historical_matchdata');
+
+                        $table_matchdata_array = array(); // 初期化
+
+                        // データが存在する場合、$check_idからテーブルデータ取得
+                        $table_matchdata = $jleagedmatchdata->getTableData($check_id);
+                        // objectから配列へ変換
+                        $table_matchdata_array = $table_matchdata->toArray();
+
+                        // DBから取得した試合日格納用変数の初期化
+                        $matchday_data = null;
+                        // DBから取得した試合日を変数へ格納
+                        if (!empty($table_matchdata_array['MatchDay'])) {
+                            // 試合日時が取得できている場合、試合日時を変数へ格納
+                            $matchday_data = $table_matchdata_array['MatchDay']->format('Y-m-d');
+                        } else {
+                            // 試合日時が取得できていない場合、カラを変数へ格納
+                            $matchday_data = $table_matchdata_array['MatchDay'];
+                        }
+
+                        // DBから取得した試合日時格納用変数
+                        $matchday_time_data = null;
+                        // DBから取得した試合日時を変数へ格納
+                        if (!empty($table_matchdata_array['MatchDayTime'])) {
+                            // 試合日時が取得できている場合、試合日時を変数へ格納
+                            $matchday_time_data = $table_matchdata_array['MatchDayTime']->format('Y-m-d H:i:s');
+                        } else {
+                            // 試合日時が取得できていない場合、カラを変数へ格納
+                            $matchday_time_data = $table_matchdata_array['MatchDayTime'];
+                        }
+
+                        // 公式ページから取得したデータとDBから取得した値を比較
+                        if ($historical_data['MatchDay'] != $matchday_data
+                         || $historical_data['MatchDayTime'] != $matchday_time_data
+                         || $historical_data['ShortStadiumName'] != $table_matchdata_array['ShortStadiumName']
+                         || $historical_data['HomeTeam'] != $table_matchdata_array['HomeTeam']
+                         || $historical_data['AwayTeam'] != $table_matchdata_array['AwayTeam']
+                         || $historical_data['HomeGetPoint'] != $table_matchdata_array['HomeGetPoint']
+                         || $historical_data['AwayGetPoint'] != $table_matchdata_array['AwayGetPoint']
+                         || $historical_data['Division'] != $table_matchdata_array['Division']
+                         || $historical_data['MatchNum'] != $table_matchdata_array['MatchNum']) {
+                            // 値が1つでも異なる場合、比較結果をログへ保存
+                            Log::info('Webページから取得したデータとDBから取得した値を比較::::データが異なります', 'jleague_historical_matchdata');
+
+                            $table_update_flg = false; // 初期化
+
+                            $table_update_flg = $jleagedmatchdata->updateData($table_matchdata, $historical_data);
+                            if ($table_update_flg == false) {
+                                // 保存に失敗した場合、結果をログへ保存
+                                Log::info('Webページから取得したデータとDBから取得した値を比較::::データの上書き失敗 $check_id = '.$check_id.' $historical_data = '.print_r($historical_data, true), 'jleague_historical_matchdata');
+                            } else {
+                                // 正常に保存された場合、登録結果をログへ保存
+                                Log::info('Webページから取得したデータとDBから取得した値を比較::::データの上書き成功 $check_id = '.$table_update_flg, 'jleague_historical_matchdata');
+                            }
+                        } else {
+                            // 比較結果をログへ保存
+                            Log::info('Webページから取得したデータとDBから取得した値を比較::::データは同じため登録処理をスキップ $check_id = '.$check_id, 'jleague_historical_matchdata');
+                        }
+                    }
+                }
+                // ログへメッセージ保存
+                Log::info($this->conf_val['season'].'シーズン'.$this->conf_val['category'].'試合日程データ登録処理::::End', 'jleague_historical_matchdata');
+            } else {
+                // Model呼び出し
+                $jleagedmatchdata = TableRegistry::get($this->conf_val['TableMatchdata']);
+                // データ保存
+                $jleagedmatchdata->registerData($jleaguehistoricalmatchdata);
+            }
+
             // ログへデータ取得終了メッセージ保存
             Log::info($this->conf_val['season'].'シーズン'.$this->conf_val['category'].'試合日程データ取得終了', 'jleague_historical_matchdata');
 
