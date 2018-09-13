@@ -16,8 +16,8 @@
     class JleagueHistoricalMatchDataController extends AppController {
         public function initialize(){
             // シーズン選択
-            // $this->season_year = 2017;
-            $this->season_year = 2016;
+            $this->season_year = 2017;
+            // $this->season_year = 2016;
 
             // configファイル、Table呼び出し用設定値を設定
             if ($this->season_year == 2017) {
@@ -42,6 +42,9 @@
             }
         }
 
+        /*
+         * 試合日程データ取得成形・新規登録、更新処理
+         */
         public function index() {
             // ログへデータ取得開始メッセージ保存
             Log::info($this->conf_val['season'].'シーズン'.$this->conf_val['category'].'試合日程データ取得開始', 'jleague_historical_matchdata');
@@ -383,25 +386,19 @@
             exit();
         }
 
-        // 試合結果DB登録・更新用メソッド
+        /*
+         * 試合結果データ取得成形、新規登録・更新処理
+         */
         public function RegistrationMatchResults() {
-            // 現在日時を取得
-            $today = date("Y/m/d H:i");
-
             /**** 試合結果登録・更新処理 start ****/
             // ログへ試合結果登録・更新処理開始メッセージ保存
             Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'試合結果登録・更新処理::::Start', 'jleague_historical_matchdata');
 
-            // J1試合日程データのModel呼び出し
-            $jleagedmatchdata = TableRegistry::get($this->conf_val['TableMatchdata']);
-            // 試合日時データ取得
-            $match_schedule_table_data = $jleagedmatchdata->getMatchScheduleNoArray();
-            if (empty($match_schedule_table_data)) {
-                // ログへ試合結果登録・更新処理開始メッセージ保存
-                Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'試合結果DB登録・更新処理::::日程データが取得できませんでした', 'jleague_historical_matchdata');
-            }
-            // 取得した試合日時データをオブジェクトから連想配列に変換
-            $match_schedule_data = $match_schedule_table_data->toArray();
+            // 現在日時を取得
+            $today = date("Y/m/d H:i");
+
+            // ログへ試合結果登録・更新準備完了メッセージ保存
+            Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'試合結果データ準備::::開始', 'jleague_historical_matchdata');
 
             // J1チームデータModel呼び出し
             $jleageteams = TableRegistry::get('JleageTeams');
@@ -412,28 +409,34 @@
                 Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'試合結果DB登録・更新処理::::チーム名が取得できませんでした', 'jleague_historical_matchdata');
             }
 
+            // J1試合日程データのModel呼び出し
+            $jleagedmatchdata = TableRegistry::get($this->conf_val['TableMatchdata']);
+
             // 試合結果集計データのDB登録用変数初期化
             $match_results_data = array();
             // 各チームごとの試合データ抽出結果格納用変数初期化
             $match_results_teams_data = array();
             // 試合結果登録用データ収集
             foreach ($teams_data as $team) {
-                // idをキーに設定しidを格納
-                $match_results_data[$team['id']]['id'] = $team['id'];
-                // idをキーに設定しTeamNameを格納
-                $match_results_data[$team['id']]['TeamName'] = $team['TeamName'];
-                // TeamNameを格納
-                $match_results_data[$team['id']]['ShortTeamName'] = $team['ShortTeamName'];
-
                 // 各チームの試合データ抽出
-                $match_results_teams_data[$team['id']] = $jleagedmatchdata->find()
-                    ->where(['HomeTeam' => $team['ShortTeamName']])
-                    ->orWhere(['AwayTeam' => $team['ShortTeamName']])
-                    ->all(); // HomeTeam = '鳥栖' or AwayTeam = '鳥栖'
+                $match_results_teams_data[$team['id']] = $jleagedmatchdata->getConfigTeamMatchData($team['ShortTeamName']);
+                if ($match_results_teams_data[$team['id']] != false) {
+                    // idをキーに設定しidを格納
+                    $match_results_data[$team['id']]['id'] = $team['id'];
+                    // idをキーに設定しTeamNameを格納
+                    $match_results_data[$team['id']]['TeamName'] = $team['TeamName'];
+                    // TeamNameを格納
+                    $match_results_data[$team['id']]['ShortTeamName'] = $team['ShortTeamName'];
+
+                    // 登録・更新対象チームのIDを格納
+                    $target_team_id[] = $team['id'];
+                }
             }
+            // カラの要素を削除
+            $match_results_teams_data = array_filter($match_results_teams_data);
 
             // チームごとに試合結果を登録・更新
-            foreach ($teams_data as $team) {
+            foreach ($target_team_id as $team_id) {
                 // 勝ち点の合計格納用変数初期化
                 $result_sum_point = 0;
                 // 総得点数集計用変数初期化
@@ -442,16 +445,13 @@
                 $result_total_lost_score = 0;
                 // 試合数集計用変数初期化
                 $result_sum_play = 0;
-                foreach ($match_results_teams_data[$team['id']] as $results_data) {
-                    // ディビジョンを設定
-                    $match_results_data[$team['id']]['Division'] = $results_data['Division'];
-
+                foreach ($match_results_teams_data[$team_id] as $results_data) {
                     // 試合結果格納用変数初期化
                     $result_status = null;
                     $result_point = null;
                     $result_home_and_away = null;
                     // Home or Awayを判定し試合結果を設定(勝ち:W(3点)、引き分け:D(1点)、負け(0点):L)
-                    if ($match_results_data[$team['id']]['ShortTeamName'] == $results_data['HomeTeam'] // ホームかどうかチェック
+                    if ($match_results_data[$team_id]['ShortTeamName'] == $results_data['HomeTeam'] // ホームかどうかチェック
                      && !is_null($results_data['HomeGetPoint']) // ホームチームのゴール数データ存在チェック
                      && !is_null($results_data['AwayGetPoint'])) { // アウェイチームのゴール数データ存在チェック
                         // ホームの場合の試合結果を設定
@@ -480,7 +480,7 @@
 
                         // 試合数の合計を格納
                         $result_sum_play = $result_sum_play + 1;
-                    } else if ($match_results_data[$team['id']]['ShortTeamName'] == $results_data['AwayTeam'] // アウェイかどうかチェック
+                    } else if ($match_results_data[$team_id]['ShortTeamName'] == $results_data['AwayTeam'] // アウェイかどうかチェック
                      && !is_null($results_data['HomeGetPoint']) // ホームチームのゴール数データ存在チェック
                      && !is_null($results_data['AwayGetPoint'])) { // アウェイチームのゴール数データ存在チェック
                         // アウェイの場合の試合結果を設定
@@ -544,7 +544,7 @@
                     $result_sum_goal_difference = $result_sum_score - $result_sum_lost_score;
 
                     // 節数による試合結果集計データのDB登録用変数へ格納
-                    $match_results_data[$team['id']][$results_data['MatchNum']] = [
+                    $match_results_data[$team_id][$results_data['MatchNum']] = [
                         // 節数を格納
                         'MatchNum' => $results_data['MatchNum'],
                         // ホームチーム名を格納
@@ -580,26 +580,115 @@
             // ログへ試合結果登録・更新処理開始メッセージ保存
             Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'試合結果DB登録・更新処理::::開始', 'jleague_historical_matchdata');
 
-            // J1試合結果登録用テーブル更新チェックフラグの初期化
-            $chk_table_registry_flg = false;
             // J1試合結果登録用テーブルのModel呼び出し
             $jleagedmatchresults = TableRegistry::get($this->conf_val['TableMatchResults']);
-            // データ登録
-            $chk_table_registry_flg = $jleagedmatchresults->registerResutlsData($match_results_data);
-            if (!empty($chk_table_registry_flg)) {
-                // ログへ試合結果登録・更新処理開始メッセージ保存
-                Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'試合結果DB登録・更新処理::::終了', 'jleague_historical_matchdata');
-            } else {
-                // ログへ試合結果登録・更新処理開始メッセージ保存
-                Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'試合結果DB登録・更新処理::::失敗', 'jleague_historical_matchdata');
+
+            // 1件ずつデータをチェックし保存
+            foreach ($match_results_data as $query_data){
+                // チームごとに試合結果データ取得
+                $team_results_data = $jleagedmatchresults->getTeamResutls($query_data['id']);
+                if (empty($team_results_data)) {
+                    // ログへ試合結果データ取得失敗メッセージ保存
+                    Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'試合結果データ取得処理::::False::::: id = '.$query_data['id'], 'jleague_historical_matchdata');
+
+                    // データ取得に失敗した場合、スキップ
+                    continue;
+                }
+
+                // 登録・更新予定のデータとテーブルのデータ比較
+                foreach ($team_results_data as $table_data) {
+                    // 節数ごとにチェックし新規登録、更新
+                    for ($match_num = 1; $match_num <= 34; $match_num++) {
+                        // 登録・更新予定データ格納用配列の初期化
+                        $update_data = array();
+
+                        // Playedカラムの登録対象データチェック
+                        if ($table_data['Matchday'.$match_num.'Played'] !== $query_data[$match_num]['Matchday'.$match_num.'Played']) {
+                            // update対象データ設定
+                            $update_data = array_merge($update_data, array('Matchday'.$match_num.'Played' => $query_data[$match_num]['Matchday'.$match_num.'Played']));
+                        }
+
+                        // Resultカラムの登録対象データチェック
+                        if ($table_data['Matchday'.$match_num.'Result'] != $query_data[$match_num]['Matchday'.$match_num.'Result']) {
+                            // update対象データ設定
+                            $update_data = array_merge($update_data, array('Matchday'.$match_num.'Result' => $query_data[$match_num]['Matchday'.$match_num.'Result']));
+                        }
+
+                        // ResultPointカラムの登録対象データチェック
+                        if ($table_data['Matchday'.$match_num.'ResultPoint'] !== $query_data[$match_num]['Matchday'.$match_num.'ResultPoint']) {
+                            // update対象データ設定
+                            $update_data = array_merge($update_data, array('Matchday'.$match_num.'ResultPoint' => $query_data[$match_num]['Matchday'.$match_num.'ResultPoint']));
+                        }
+
+                        // ResultSumPointカラムの登録対象データチェック
+                        if ($table_data['Matchday'.$match_num.'ResultSumPoint'] !== $query_data[$match_num]['Matchday'.$match_num.'ResultSumPoint']) {
+                            // update対象データ設定
+                            $update_data = array_merge($update_data, array('Matchday'.$match_num.'ResultSumPoint' => $query_data[$match_num]['Matchday'.$match_num.'ResultSumPoint']));
+                        }
+
+                        // TotalGoalScoreカラムの登録対象データチェック
+                        if ($table_data['Matchday'.$match_num.'TotalGoalScore'] !== $query_data[$match_num]['Matchday'.$match_num.'TotalGoalScore']) {
+                            // update対象データ設定
+                            $update_data = array_merge($update_data, array('Matchday'.$match_num.'TotalGoalScore' => $query_data[$match_num]['Matchday'.$match_num.'TotalGoalScore']));
+                        }
+
+                        // TotalLostGoalScoreカラムの登録対象データチェック
+                        if ($table_data['Matchday'.$match_num.'TotalLostGoalScore'] !== $query_data[$match_num]['Matchday'.$match_num.'TotalLostGoalScore']) {
+                            // update対象データ設定
+                            $update_data = array_merge($update_data, array('Matchday'.$match_num.'TotalLostGoalScore' => $query_data[$match_num]['Matchday'.$match_num.'TotalLostGoalScore']));
+                        }
+
+                        // GoalDifferenceカラムの登録対象データチェック
+                        if ($table_data['Matchday'.$match_num.'GoalDifference'] !== $query_data[$match_num]['Matchday'.$match_num.'GoalDifference']) {
+                            // update対象データ設定
+                            $update_data = array_merge($update_data, array('Matchday'.$match_num.'GoalDifference' => $query_data[$match_num]['Matchday'.$match_num.'GoalDifference']));
+                        }
+
+                        // HomeAndAwayカラムの登録対象データチェック
+                        if ($table_data['Matchday'.$match_num.'HomeAndAway'] != $query_data[$match_num]['Matchday'.$match_num.'HomeAndAway']) {
+                            // update対象データ設定
+                            $update_data = array_merge($update_data, array('Matchday'.$match_num.'HomeAndAway' => $query_data[$match_num]['Matchday'.$match_num.'HomeAndAway']));
+                        }
+
+                        // アップデート対象データが存在するかチェック
+                        if (!empty($update_data)) {
+                            // J1試合結果登録用テーブル更新チェックフラグの初期化
+                            $chk_table_registry_flg = false;
+
+                            // アップデート対象データが存在する場合、updateクエリ実行
+                            $chk_table_registry_flg = $jleagedmatchresults->saveResultsData($update_data, $query_data['id']);
+                            if ($chk_table_registry_flg == false) {
+                                // データ更新に失敗した場合、ログへ試合結果データ更新失敗メッセージ保存
+                                Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'試合結果データ更新処理::::FALSE::::: id = '.$query_data['id'].', $match_num = '.$match_num, 'jleague_historical_matchdata');
+
+                                // データ更新に失敗した場合、スキップ
+                                continue;
+                            } else {
+                                // ログへ試合結果登録・更新完了メッセージ保存
+                                Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'試合結果データ更新完了::::: id = '.$query_data['id'].', $match_num = '.$match_num, 'jleague_historical_matchdata');
+                            }
+                        } else { // DBと更新対象データが同じ場合
+                            // updateクエリ実行しない場合、メッセージ保存
+                            Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'試合結果データ更新処理:::::試合結果データは同じため登録・更新処理スキップ:::::id = '.$query_data['id'].', $match_num = '.$match_num, 'jleague_historical_matchdata');
+                        }
+                    }
+                }
             }
+            // ログへ試合結果登録・更新処理終了メッセージ保存
+            Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'試合結果DB登録・更新処理::::終了', 'jleague_historical_matchdata');
+
+            // ログへ試合結果登録・更新処理開始メッセージ保存
+            Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'試合結果登録・更新処理::::End', 'jleague_historical_matchdata');
 
             // 処理終了
             exit();
         }
 
+        /*
+         * 試合順位データ集計、新規登録・更新処理
+         */
         public function RegistrationMatchRank() {
-            /**** 順位データの登録・更新処理 start ****/
+            /**** 順位データの集計処理 start ****/
             // ログへ試合結果登録・更新処理開始メッセージ保存
             Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'順位データの登録・更新処理::::Start', 'jleague_historical_matchdata');
 
@@ -613,28 +702,7 @@
             // 各節ごとに順位を登録・更新
             for ($target_match_num = 1; $target_match_num <= 34; $target_match_num++) {
                 // 各節ごとの試合結果データを取得
-                $target_results_data = $jleagedmatchresults->find()
-                    ->select([
-                        'id', // チームID
-                        'TeamName', // チーム名
-                        'Matchday'.$target_match_num.'Rank', // 順位
-                        'Matchday'.$target_match_num.'Played', // 試合数
-                        'Matchday'.$target_match_num.'Result', // 試合結果
-                        'Matchday'.$target_match_num.'ResultPoint', // 勝ち点
-                        'Matchday'.$target_match_num.'ResultSumPoint', // 総勝ち点数
-                        'Matchday'.$target_match_num.'TotalGoalScore', // 総ゴール数
-                        'Matchday'.$target_match_num.'TotalLostGoalScore', //総失点数
-                        'Matchday'.$target_match_num.'GoalDifference', // 得失点差
-                        'Matchday'.$target_match_num.'HomeAndAway', // 節数に対するHome or Away
-                    ])
-                    // 順位決定条件1:勝ち点を降順でソート
-                    ->order(['Matchday'.$target_match_num.'ResultSumPoint' => 'DESC'])
-                    // 順位決定条件2:得失点差を降順でソート
-                    ->order(['Matchday'.$target_match_num.'GoalDifference' => 'DESC'])
-                    // 順位決定条件3:総得点を降順でソート
-                    ->order(['Matchday'.$target_match_num.'TotalGoalScore' => 'DESC'])
-                    // データ取得実行
-                    ->all();
+                $target_results_data = $jleagedmatchresults->getMatchResultsTargetMatchNum($target_match_num);
                 // 参照用として配列へ変換
                 $target_results_data_array = $target_results_data->toArray();
 
@@ -726,17 +794,63 @@
                     }
                 }
             }
+            // ログへ順位データ登録・更新処理完了メッセージ保存
+            Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'順位データの集計準備完了', 'jleague_historical_matchdata');
+            /**** 順位データの集計処理 end ****/
 
-            // 順位データ登録
-            $rank_data_update_result = $jleagedmatchresults->registerRankData($rank_data);
-            if ($rank_data_update_result == true) {
-                // ログへ順位データ登録・更新処理完了メッセージ保存
-                Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'順位データの登録・更新処理::::End', 'jleague_historical_matchdata');
-            } else {
-                // ログへ順位データ登録・更新処理失敗メッセージ保存
-                Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'順位データの登録・更新処理::::FALSE::::End', 'jleague_historical_matchdata');
+            /**** 順位データの登録・更新処理 start ****/
+            // ログへ順位データ登録・更新処理完了メッセージ保存
+            Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'順位データの登録・更新開始', 'jleague_historical_matchdata');
+
+            // 登録・更新対象の節数格納用変数初期化
+            $target_match_num = 0;
+            // 各節ごとに順位を登録・更新
+            foreach ($rank_data as $data) {
+                // 登録・更新対象の節数更新
+                $target_match_num = $target_match_num + 1;
+
+                // 1件ずつデータをチェックし保存
+                for ($num = 0; $num < J1LEAGE_ALL_TEAM_NUM; $num++) { // 18チーム分更新
+                    // 登録・更新対象のRankデータ取得
+                    $db_team_result_data = $jleagedmatchresults->getMatchRank($target_match_num, $data[$num]['id']);
+                    if (empty($db_team_result_data)) {
+                        // ログへ登録・更新対象のRankデータ取得に失敗したメッセージ保存
+                        Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'順位データ登録・更新処理:::::Rankデータnullのためスキップ::::id = '.$data[$num]['id'].'MatchNum = '.$data[$num]['MatchNum'], 'jleague_historical_matchdata');
+
+                        // データ取得に失敗した場合、スキップ
+                        continue;
+                    }
+                    // 取得した登録・更新対象のRankデータを配列へ変換
+                    $db_team_result_data_array = $db_team_result_data->toArray();
+
+                    // テーブルのRankカラム値と更新予定のRankデータが同じかどうかチェック
+                    if ($db_team_result_data_array[0]['id'] == $data[$num]['id']
+                     && $db_team_result_data_array[0]['Matchday'.$target_match_num.'Rank'] == $data[$num]['Matchday'.$target_match_num.'Rank']) {
+                         // テーブルのRankカラム値と更新予定のRankデータが同じ場合、同値のメッセージ保存
+                        Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'順位データ登録・更新処理:::::Rankデータ同値のためupdateなし::::MatchNum = '.$data[$num]['MatchNum'].' id = '.$data[$num]['id'], 'jleague_historical_matchdata');
+
+                        // テーブルのRankカラム値と更新予定のRankデータが同じ場合、updateは行わずスキップ
+                        continue;
+                    }
+
+                    // チームidを指定しupdateクエリ実行を実行
+                    $update_rank_data_flg = $jleagedmatchresults->saveRankData($target_match_num, $data[$num]['Matchday'.$target_match_num.'Rank'], $data[$num]['id']);
+                    if (empty($update_rank_data_flg)) {
+                        // ログへ登録・更新対象のRankデータのupdateクエリ実行失敗メッセージ保存
+                        Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'順位データ登録・更新処理:::::Rankデータupdateに失敗しました::::MatchNum = '.$data[$num]['MatchNum'].' id = '.$data[$num]['id'].' rank = '.$data[$num]['Matchday'.$target_match_num.'Rank'], 'jleague_historical_matchdata');
+
+                        // データ更新に失敗した場合、スキップ
+                        continue;
+                    } else {
+                        // ログへ登録・更新対象のRankデータのupdateクエリが正常に実行された場合のメッセージ保存
+                        Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'順位データ登録・更新処理:::::Rankデータupdate完了::::MatchNum = '.$data[$num]['MatchNum'].' id = '.$data[$num]['id'].' rank = '.$data[$num]['Matchday'.$target_match_num.'Rank'], 'jleague_historical_matchdata');
+                    }
+                }
             }
             /**** 順位データの登録・更新処理 end ****/
+
+            // ログへ順位データ登録・更新処理完了メッセージ保存
+            Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'順位データの登録・更新処理::::End', 'jleague_historical_matchdata');
 
             // 処理終了
             exit();

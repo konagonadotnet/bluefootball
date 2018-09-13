@@ -6,6 +6,7 @@
     use Cake\Log\Log;
 
     class JleageD1Matchdata2017Table extends Table {
+
         public function initialize(array $config)
         {
             $this->setTable('jleage_d1_matchdata2017');
@@ -32,12 +33,12 @@
 
             // Select文実行
             $query_data = $this->find()
-            ->select(['id'])
-            ->where(['Division' => $data['Division']])
-            ->where(['MatchNum' => $data['MatchNum']])
-            ->where(['HomeTeam' => $data['HomeTeam']])
-            ->where(['AwayTeam' => $data['AwayTeam']])
-            ->all();
+                ->select(['id'])
+                ->where(['Division' => $data['Division']])
+                ->where(['MatchNum' => $data['MatchNum']])
+                ->where(['HomeTeam' => $data['HomeTeam']])
+                ->where(['AwayTeam' => $data['AwayTeam']])
+                ->all();
 
             // 取得したデータ件数により有無を判定
             if($query_data->count() != 0) {
@@ -80,5 +81,36 @@
                 // DBへの保存に成功した場合、idを返す
                 return $update_data_article->id;
             }
+        }
+
+        /*
+         * 全データ取得メソッド
+         */
+        public function getMatchScheduleNoArray() {
+            // Select文実行
+            $query_data = $this->find();
+            if($query_data->count() == 0) {
+                // データが取得できなかった場合
+                return false;
+            }
+
+            return $query_data;
+        }
+
+        /*
+         * チーム指定による全データ取得メソッド
+         */
+        public function getConfigTeamMatchData($short_team_name) {
+            // Select文実行
+            $query_data = $this->find()
+                ->where(['HomeTeam' => $short_team_name])
+                ->orWhere(['AwayTeam' => $short_team_name])
+                ->all();
+            if($query_data->count() == 0) {
+                // データが取得できなかった場合
+                return false;
+            }
+
+            return $query_data;
         }
     }

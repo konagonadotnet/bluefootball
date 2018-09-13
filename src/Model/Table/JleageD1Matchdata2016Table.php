@@ -6,6 +6,7 @@
     use Cake\Log\Log;
 
     class JleageD1Matchdata2016Table extends Table {
+
         public function initialize(array $config)
         {
             $this->setTable('jleage_d1_matchdata2016');
@@ -13,8 +14,8 @@
         }
 
         /*
-        * idカラム値指定によるデータ取得クエリ実行メソッド
-        */
+         * idカラム値指定によるデータ取得クエリ実行メソッド
+         */
         public function getTableData($id) {
             // idによるデータ取得
             $query_data = $this->get($id);
@@ -80,5 +81,36 @@
                 // DBへの保存に成功した場合、idを返す
                 return $update_data_article->id;
             }
+        }
+
+        /*
+         * 全データ取得メソッド
+         */
+        public function getMatchScheduleNoArray() {
+            // Select文実行
+            $query_data = $this->find();
+            if($query_data->count() == 0) {
+                // データが取得できなかった場合
+                return false;
+            }
+
+            return $query_data;
+        }
+
+        /*
+         * チーム指定による全データ取得メソッド
+         */
+        public function getConfigTeamMatchData($short_team_name) {
+            // Select文実行
+            $query_data = $this->find()
+                ->where(['HomeTeam' => $short_team_name])
+                ->orWhere(['AwayTeam' => $short_team_name])
+                ->all();
+            if($query_data->count() == 0) {
+                // データが取得できなかった場合
+                return false;
+            }
+
+            return $query_data;
         }
     }
