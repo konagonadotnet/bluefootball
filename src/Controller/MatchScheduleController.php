@@ -12,21 +12,64 @@
     use Cake\View\Helper\UrlHelper;
     use Cake\Routing\Router;
 
-
     class MatchScheduleController extends AppController {
 
         public function initialize() {
             parent::initialize();
-            // JleageD1Matchdata2018テーブルを呼び出しインスタンス化
-            $this->JleageD1Matchdata2018 = TableRegistry::get('JleageD1Matchdata2018');
+
+            // Seasonフィルターの設定値
+            $this->season_filter = array(
+                "2018" => [
+                    'season' => 2018,
+                    'value' => './',
+                    'text' => '2018',
+                    'selected' => false,
+                ],
+                "2017" => [
+                    'season' => 2017,
+                    'value' => './?season=2017',
+                    'text' => '2017',
+                    'selected' => false,
+                ],
+                "2016" => [
+                    'season' => 2016,
+                    'value' => './?season=2016',
+                    'text' => '2016',
+                    'selected' => false,
+                ],
+            );
+
+            // Model呼び出しをインスタンス化
+            if ($this->request->getQuery('season') == null || $this->request->getQuery('season') == 2018) { // get取得
+                // JleageD1Matchdata2018テーブルを呼び出しインスタンス化
+                $this->JleageMatchdata = TableRegistry::get('JleageD1Matchdata2018');
+
+                // Seasonフィルターの選択済み設定値をtrueへ変更
+                $this->season_filter[2018]['selected'] = true;
+            } else if ($this->request->getQuery('season') == 2017) { // get取得
+                // JleageD1Matchdata2017テーブルを呼び出しインスタンス化
+                $this->JleageMatchdata = TableRegistry::get('JleageD1Matchdata2017');
+
+                // Seasonフィルターの選択済み設定値をtrueへ変更
+                $this->season_filter[2017]['selected'] = true;
+            } else if ($this->request->getQuery('season') == 2016) { // get取得
+                // JleageD1Matchdata2016テーブルを呼び出しインスタンス化
+                $this->JleageMatchdata = TableRegistry::get('JleageD1Matchdata2016');
+
+                // Seasonフィルターの選択済み設定値をtrueへ変更
+                $this->season_filter[2016]['selected'] = true;
+            }
         }
 
         public function index() {
             // 現在日時を取得
             $today = date("Y/m/d H:i");
 
+            // Seasonフィルターの設定値を格納
+            $season_filter = $this->season_filter;
+
             // 試合日時データ取得
-            $match_schedule_paginate_data = $this->JleageD1Matchdata2018->getMatchScheduleNoArray();
+            $match_schedule_paginate_data = $this->JleageMatchdata->getMatchScheduleNoArray();
             if (empty($match_schedule_paginate_data)) {
                 // 試合日時データが取得できなかった場合、メッセージ表示
                 $this->Flash->error(__('日程データが取得できませんでした'));
@@ -44,9 +87,16 @@
             }
 
             // 試合日時データ取得
-            $match_schedule_settoday_data = $this->JleageD1Matchdata2018->getMatchScheduleSetToday($today);
-            // 次の試合が開催される節数取得
-            $target_anker_id = $match_schedule_settoday_data->first()->get('MatchNum');
+            if ($this->request->getQuery('season') == null || $this->request->getQuery('season') == 2018) {
+                $match_schedule_settoday_data = $this->JleageMatchdata->getMatchScheduleSetToday($today);
+                // 次の試合が開催される節数取得
+                $target_anker_id = $match_schedule_settoday_data->first()->get('MatchNum');
+                // 次節の試合日を取得
+                $match_schedule_nextmatchday = $this->getNextMatchDays($target_anker_id);
+            } else {
+                $target_anker_id = '';
+                $match_schedule_nextmatchday = '';
+            }
 
             $count_num = 0;
             foreach ($match_schedule_data as $match_data) {
@@ -85,10 +135,8 @@
                 $count_num = $count_num + 1;
             }
 
-            // 次節の試合日を取得
-            $match_schedule_nextmatchday = $this->getNextMatchDays($target_anker_id);
-
             // viewへデータを渡す
+            $this->set(compact('season_filter')); // シーズン選択ドロップダウン設定値を渡す
             $this->set(compact('match_schedule_data')); // 試合日程データを渡す
             $this->set(compact('target_anker_id')); // 次節数を渡す
             $this->set(compact('match_schedule_nextmatchday')); // 次節の試合日を渡す
@@ -130,7 +178,7 @@
         // 次節の試合日を取得
         public function getNextMatchDays($target_anker_id) {
             // 次節指定による試合日時を取得
-            $data_nextmatchday = $this->JleageD1Matchdata2018->getNextMatchday($target_anker_id);
+            $data_nextmatchday = $this->JleageMatchdata->getNextMatchday($target_anker_id);
             if (empty($data_nextmatchday)) {
                 // データ取得に失敗した場合、カラを設定
                 return '';

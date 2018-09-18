@@ -229,4 +229,40 @@
 
             return $query_data;
         }
+
+        /*
+         * 節数指定による順位データ取得メソッド
+         */
+        public function getMatchResultsTargetMatchNum($target_match_num) {
+            // 各節ごとの試合結果データを取得
+            $query_data = $this->find()
+                ->select([
+                    'id', // チームID
+                    'TeamName', // チーム名
+                    'Matchday'.$target_match_num.'Rank', // 順位
+                    'Matchday'.$target_match_num.'Played', // 試合数
+                    'Matchday'.$target_match_num.'Result', // 試合結果
+                    'Matchday'.$target_match_num.'ResultPoint', // 勝ち点
+                    'Matchday'.$target_match_num.'ResultSumPoint', // 総勝ち点数
+                    'Matchday'.$target_match_num.'TotalGoalScore', // 総ゴール数
+                    'Matchday'.$target_match_num.'TotalLostGoalScore', //総失点数
+                    'Matchday'.$target_match_num.'GoalDifference', // 得失点差
+                    'Matchday'.$target_match_num.'HomeAndAway', // 節数に対するHome or Away
+                ])
+                // 順位決定条件1:勝ち点を降順でソート
+                ->order(['Matchday'.$target_match_num.'ResultSumPoint' => 'DESC'])
+                // 順位決定条件2:得失点差を降順でソート
+                ->order(['Matchday'.$target_match_num.'GoalDifference' => 'DESC'])
+                // 順位決定条件3:総得点を降順でソート
+                ->order(['Matchday'.$target_match_num.'TotalGoalScore' => 'DESC'])
+                // データ取得実行
+                ->all();
+            if($query_data->count() == 0) {
+                // データが取得できなかった場合
+                return false;
+            }
+
+            // 配列で返す
+            return $query_data;
+        }
     }

@@ -9,13 +9,50 @@
 				<p>TOP > Jリーグ 順位</p>
 			</div>
 			<div class="title">
-				<h1>J1リーグ 2018シーズン | 順位</h1>
+				<h1>J1リーグ  <?php echo $this->MatchSchedule->getSeasonYear($this->request->getQuery('season')); ?>シーズン | 順位</h1>
 			</div>
-			<!-- div id="container"></div -->
+			<div class="filter">
+				<h5><span>Filter</span></h5>
+			</div>
+			<div class="match_day">
+<?php
+            // ドロップダウンの表示
+			echo $this->Form->input(
+			    "Season", [
+			        "type" => "select",
+			        "options" => [
+                        [
+			                "value" => $season_filter[2018]['value'],
+			                "text" => $season_filter[2018]['text'],
+			                "selected" => $season_filter[2018]['selected']],
+			            [
+			                "value" => $season_filter[2017]['value'],
+			                "text" => $season_filter[2017]['text'],
+			                "selected" => $season_filter[2017]['selected']],
+			            [
+			                "value" => $season_filter[2016]['value'],
+			                "text" => $season_filter[2016]['text'],
+			                "selected" => $season_filter[2016]['selected']],
+			        ],
+            ]);
+?>
+			</div>
+			<div class="title">
+<?php if ($this->MatchSchedule->getSeasonYear($this->request->getQuery('season')) == 2016) { ?>
+				     <h1>年間勝点順位グラフ</h1>
+<?php } else { ?>
+					<h1>順位グラフ</h1>
+<?php } ?>
+			</div>
 			<div id="container-winning-point"></div>
 
 			<div class="table_title">
-				<h2>J1リーグ 2018シーズン | 順位表</h2>
+
+<?php if ($this->MatchSchedule->getSeasonYear($this->request->getQuery('season')) == 2016) { ?>
+					<h2>J1リーグ <?php echo $this->MatchSchedule->getSeasonYear($this->request->getQuery('season')); ?>シーズン | 年間勝点順位表</h2>
+<?php } else { ?>
+					<h2>J1リーグ <?php echo $this->MatchSchedule->getSeasonYear($this->request->getQuery('season')); ?>シーズン | 順位表</h2>
+<?php } ?>
 			</div>
 			<div class="table_caution">
 				<p>※第<?php echo $target_match_num; ?>節終了時点</p>

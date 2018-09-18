@@ -11,24 +11,48 @@
 				<p>TOP > Jリーグ 日程・結果</p>
 			</div>
 			<div class="title">
-				<h1>J1リーグ 2018シーズン | 日程・結果</h1>
+				<h1>J1リーグ <?php echo $this->MatchSchedule->getSeasonYear($this->request->getQuery('season')); ?>シーズン | 日程・結果</h1>
 			</div>
-
-
+			<div class="filter">
+				<h5><span>Filter</span></h5>
+			</div>
 			<div class="match_day">
-					<h5><span>Next Match</span></h5>
+<?php
+            // ドロップダウンの表示
+            echo $this->Form->input(
+                "Season", [
+                    "type" => "select",
+                    "options" => [
+                        [
+                            "value" => $season_filter[2018]['value'],
+                            "text" => $season_filter[2018]['text'],
+                            "selected" => $season_filter[2018]['selected']],
+                        [
+                            "value" => $season_filter[2017]['value'],
+                            "text" => $season_filter[2017]['text'],
+                            "selected" => $season_filter[2017]['selected']],
+                        [
+                            "value" => $season_filter[2016]['value'],
+                            "text" => $season_filter[2016]['text'],
+                            "selected" => $season_filter[2016]['selected']],
+                    ],
+            ]);
+?>
 			</div>
-
+<?php if (!empty($target_anker_id)) { ?>
+			<div class="match_day">
+				<h5><span>Next Match</span></h5>
+			</div>
 			<div id="target_anker_next_match">
 				<a class="jumpbutton" href="#<?= $target_anker_id ?>">
 					<span>第<?= $target_anker_id ?>節<br>
-<?php foreach ($match_schedule_nextmatchday as $nextmatchday) { ?>
+<?php   foreach ($match_schedule_nextmatchday as $nextmatchday) { ?>
 						<?= $nextmatchday['MatchDay']->i18nFormat('YYYY/MM/dd').'　'; ?>
-<?php } ?>
+<?php   } ?>
             		</span>
 				</a>
 			</div>
-
+<?php } ?>
 			<div id="match_schedule_data">
 				<?= $this->Flash->render() ?>
 
@@ -101,9 +125,7 @@
 						</tr>
 					</tbody>
 				</table>
-<?php
-    }
-?>
+<?php } ?>
 			</div>
 		</div>
 <?php

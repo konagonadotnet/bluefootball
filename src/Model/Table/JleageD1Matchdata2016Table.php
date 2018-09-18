@@ -113,4 +113,23 @@
 
             return $query_data;
         }
+
+        // 現在日時に対して試合が実施されていない節を取得
+        public function getMatchNumNotPlayGame($today) {
+            // Select文実行
+            $query_data = $this->find()
+                ->select(['MatchNum'])
+                ->where(['MatchDay >=' => $today])
+                ->where(['MatchDayTime IS NOT NULL'])
+                ->where(['HomeGetPoint IS NULL'])
+                ->where(['AwayGetPoint IS NULL'])
+                ->group(['MatchNum'])
+                ->all();
+            if($query_data->count() == 0) {
+                // データが取得できなかった場合
+                return false;
+            }
+
+            return $query_data;
+        }
     }

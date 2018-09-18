@@ -14,10 +14,11 @@
     use Sunra\PhpSimple\HtmlDomParser;
 
     class JleagueHistoricalMatchDataController extends AppController {
-        public function initialize(){
+
+        public function initialize() {
             // シーズン選択
-            $this->season_year = 2017;
-            // $this->season_year = 2016;
+            // $this->season_year = 2017;
+            $this->season_year = 2016;
 
             // configファイル、Table呼び出し用設定値を設定
             if ($this->season_year == 2017) {

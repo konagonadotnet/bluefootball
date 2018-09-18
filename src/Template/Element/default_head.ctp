@@ -30,8 +30,8 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<!-- script src="http://code.highcharts.com/highcharts.js"></script -->
 		<?php echo $this->Html->script('highcharts'); ?>
-		<?php echo $this->Html->script('highcharts-option'); ?>
 		<?php echo $this->Html->script('highcharts-option-winning-point'); ?>
+		<?php echo $this->Html->script('match-schedule'); ?>
 	</head>
 	<body>
 		<div id="header">

@@ -1,6 +1,27 @@
 $(function(){
+	// URLパスを取得
+	var pathname = location.pathname;
+	// URLパラメータを取得
+	var searchword = location.search;
+	// getJSON用url変数へ格納
+	var url = pathname + searchword;
+
+	// グラフタイトル名を設定
+	if (searchword == '?season=2017') {
+		// 2017シーズンのグラフタイトルを設定
+		var title_text = '2017 J1リーグ 順位推移';
+	} else if(searchword == '?season=2016') {
+		// 2016シーズンのグラフタイトルを設定
+		var title_text = '2016 J1リーグ 年間勝点推移';
+	} else {
+		// 2018シーズンのグラフタイトルを設定
+		var title_text = '2018 J1リーグ 順位推移';
+	}
+
 	$.getJSON(
-		"./MatchResultsGraph",
+		// リクエストURLを指定
+		url,
+		// 通信成功時の処理
 		function(json){
 			// tooltip表示内容設定
 			var formatter = function() {
@@ -21,7 +42,8 @@ $(function(){
 				},
 				// グラフタイトル名設定
 				title: {
-					text: '2018 J1リーグ 順位推移グラフ'
+					// text: '2018 J1リーグ 順位推移グラフ'
+					text: title_text
 				},
 
 				// サブタイトル名設定

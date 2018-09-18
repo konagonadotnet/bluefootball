@@ -16,7 +16,6 @@
     use Cake\View\Helper\UrlHelper;
     use Cake\Routing\Router;
 
-
     class MatchResultsGraphController extends AppController {
         /*
          public $paginate = [
@@ -25,78 +24,112 @@
                 'MatchSchedule.id' => 'desc'
             ]
          ];
-
-         public function initialize() {
-            parent::initialize();
-            $this->loadComponent('Paginator');
-         }
          */
 
         public function initialize() {
             parent::initialize();
+            // コンポーネントの呼び出し
+            // $this->loadComponent('Paginator');
             $this->loadComponent('RequestHandler');
+
+            // Seasonフィルターの設定値
+            $this->season_filter = array(
+                "2018" => [
+                    'season' => 2018,
+                    'value' => './match-results-graph',
+                    'text' => '2018',
+                    'selected' => false,
+                ],
+                "2017" => [
+                    'season' => 2017,
+                    'value' => './match-results-graph?season=2017',
+                    'text' => '2017',
+                    'selected' => false,
+                ],
+                "2016" => [
+                    'season' => 2016,
+                    'value' => './match-results-graph?season=2016',
+                    'text' => '2016',
+                    'selected' => false,
+                ],
+            );
+
+            // Model呼び出しをインスタンス化
+            if ($this->request->getQuery('season') == null || $this->request->getQuery('season') == 2018) { // get取得
+                // JleageD1Matchdata2018テーブルを呼び出しインスタンス化
+                $this->JleageMatchdata = TableRegistry::get('JleageD1Matchdata2018');
+                $this->JleageMatchResults = TableRegistry::get('JleageD1MatchResults2018');
+
+                // Seasonフィルターの選択済み設定値をtrueへ変更
+                $this->season_filter[2018]['selected'] = true;
+            } else if ($this->request->getQuery('season') == 2017) { // get取得
+                // JleageD1Matchdata2017テーブルを呼び出しインスタンス化
+                $this->JleageMatchdata = TableRegistry::get('JleageD1Matchdata2017');
+                $this->JleageMatchResults = TableRegistry::get('JleageD1MatchResults2017');
+
+                // Seasonフィルターの選択済み設定値をtrueへ変更
+                $this->season_filter[2017]['selected'] = true;
+            } else if ($this->request->getQuery('season') == 2016) { // get取得
+                // JleageD1Matchdata2016テーブルを呼び出しインスタンス化
+                $this->JleageMatchdata = TableRegistry::get('JleageD1Matchdata2016');
+                $this->JleageMatchResults = TableRegistry::get('JleageD1MatchResults2016');
+
+                // Seasonフィルターの選択済み設定値をtrueへ変更
+                $this->season_filter[2016]['selected'] = true;
+            }
         }
 
+        /*
+         * シーズン指定による順位グラフと順位表を表示
+         */
         public function index() {
             // 現在日時を取得
             $today = date("Y/m/d H:i");
 
-            // J1試合結果登録用テーブルのModel呼び出し
-            $jleaged1matchresults2018 = TableRegistry::get('JleageD1MatchResults2018');
+            // Seasonフィルターの設定値を格納
+            $season_filter = $this->season_filter;
+
             // データ取得
-            $results_data = $jleaged1matchresults2018->getAllResutlsData();
+            $results_data = $this->JleageMatchResults->getAllResutlsData();
             // 取得したデータを配列へ変換
             $graph_data =  $results_data->toArray();
 
-            // Model呼び出し
-            $jleaged1matchdata2018 = TableRegistry::get('JleageD1Matchdata2018');
             // 各節数に対して未実施の試合が存在する節数を取得
-            $target_match_num = $jleaged1matchdata2018->getMatchNumNotPlayGame($today);
-            // 次の試合が開催される節数格納用変数初期化
-            $target_anker_id = 0;
-            // 次の試合が開催される節数を取得
-            foreach ($target_match_num as $num) {
-                // 未実施の試合が存在する節に対して未実施の試合数を取得
-                $count_not_play_game_num = $jleaged1matchdata2018->getUnexecutedGameNum($num->MatchNum, $today);
-                if ($count_not_play_game_num == J1LEAGE_MATCHNUM_NUMBER_OF_GAME) {
-                    // 未実施の試合が存在する節に対して全ての試合が未実施の場合、次の試合が開催される最新の節数として設定
-                    $target_anker_id = $num->MatchNum;
-                    // ループを中断し抜ける
-                    break;
+            $target_match_num = $this->JleageMatchdata->getMatchNumNotPlayGame($today);
+            if (!empty($target_match_num)) {
+                // 次の試合が開催される節数格納用変数初期化
+                $target_anker_id = 0;
+                // 次の試合が開催される節数を取得
+                foreach ($target_match_num as $num) {
+                    // 未実施の試合が存在する節に対して未実施の試合数を取得
+                    $count_not_play_game_num = $this->JleageMatchdata->getUnexecutedGameNum($num->MatchNum, $today);
+                    if ($count_not_play_game_num == J1LEAGE_MATCHNUM_NUMBER_OF_GAME) {
+                        // 未実施の試合が存在する節に対して全ての試合が未実施の場合、次の試合が開催される最新の節数として設定
+                        $target_anker_id = $num->MatchNum;
+                        // ループを中断し抜ける
+                        break;
+                    }
                 }
+                // 次の試合が開催される節数を設定
+                $graph_data['NextMatchNum'] = $target_anker_id;
+
+                // 試合が終了している最新の節数を設定
+                $target_match_num = $target_anker_id - 1;
+            } else {
+                // 次の試合が開催される節数を設定
+                $graph_data['NextMatchNum'] = J1LEAGE_2018_MAX_MATCHNUM_NUMBER_OF_GAME;
+
+                // 試合が終了している最新の節数を設定
+                $target_match_num = J1LEAGE_2018_MAX_MATCHNUM_NUMBER_OF_GAME;
             }
-            // 次の試合が開催される節数を設定
-            $graph_data['NextMatchNum'] = $target_anker_id;
 
             // J1試合結果データをグラフ表示用データをviewへ渡す
             $this->set('results_data', $graph_data);
             // JSONへ変換
             $this->set('_serialize', ['results_data']);
 
-            // 試合が終了している最新の節数を設定
-            $target_match_num = $target_anker_id - 1;
             // 試合が終了している最新の節数に対する順位データを取得
-            $table_data = $jleaged1matchresults2018->find()
-                ->select([
-                    'id', // チームID
-                    'TeamName', // チーム名
-                    'Matchday'.$target_match_num.'Played', // 試合数
-                    'Matchday'.$target_match_num.'Result', // 試合結果
-                    'Matchday'.$target_match_num.'ResultPoint', // 勝ち点
-                    'Matchday'.$target_match_num.'ResultSumPoint', // 総勝ち点数
-                    'Matchday'.$target_match_num.'TotalGoalScore', // 総ゴール数
-                    'Matchday'.$target_match_num.'TotalLostGoalScore', //総失点数
-                    'Matchday'.$target_match_num.'GoalDifference', // 得失点差
-                    'Matchday'.$target_match_num.'HomeAndAway', // 節数に対するHome or Away
-                ])
-                // 順位決定条件1:勝ち点を降順でソート
-                ->order(['Matchday'.$target_match_num.'ResultSumPoint' => 'DESC'])
-                // 順位決定条件2:得失点差を降順でソート
-                ->order(['Matchday'.$target_match_num.'GoalDifference' => 'DESC'])
-                // 順位決定条件3:総得点を降順でソート
-                ->order(['Matchday'.$target_match_num.'TotalGoalScore' => 'DESC'])
-                // データ取得実行
-                ->all();
+            $table_data = $this->JleageMatchResults->getMatchResultsTargetMatchNum($target_match_num);
 
             // $table_dataのオブジェクト要素名を各変数へ格納
             $table_data_key_name_played = 'Matchday'.$target_match_num.'Played';
@@ -123,6 +156,8 @@
             $this->set('target_match_num', $target_match_num);
             // 順位表のデータをviewへ渡す
             $this->set('table_data', $table_data);
+            // シーズン選択ドロップダウン設定値をviewへ渡す
+            $this->set(compact('season_filter'));
         }
 
         // 試合結果DB登録・更新用メソッド
