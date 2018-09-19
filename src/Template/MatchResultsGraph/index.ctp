@@ -37,16 +37,17 @@
             ]);
 ?>
 			</div>
-			<div class="title">
+			<!-- div class="title" -->
+			<div class="title-graph">
 <?php if ($this->MatchSchedule->getSeasonYear($this->request->getQuery('season')) == 2016) { ?>
-				     <h1>年間勝点順位グラフ</h1>
+					<h2>J1リーグ  <?php echo $this->MatchSchedule->getSeasonYear($this->request->getQuery('season')); ?>シーズン | 年間勝点順位グラフ</h1>
 <?php } else { ?>
-					<h1>順位グラフ</h1>
+					<h2>J1リーグ  <?php echo $this->MatchSchedule->getSeasonYear($this->request->getQuery('season')); ?>シーズン | 順位グラフ</h1>
 <?php } ?>
 			</div>
 			<div id="container-winning-point"></div>
 
-			<div class="table_title">
+			<div class="title-table">
 
 <?php if ($this->MatchSchedule->getSeasonYear($this->request->getQuery('season')) == 2016) { ?>
 					<h2>J1リーグ <?php echo $this->MatchSchedule->getSeasonYear($this->request->getQuery('season')); ?>シーズン | 年間勝点順位表</h2>
@@ -54,7 +55,7 @@
 					<h2>J1リーグ <?php echo $this->MatchSchedule->getSeasonYear($this->request->getQuery('season')); ?>シーズン | 順位表</h2>
 <?php } ?>
 			</div>
-			<div class="table_caution">
+			<div class="title-caution">
 				<p>※第<?php echo $target_match_num; ?>節終了時点</p>
 			</div>
 			<table>
