@@ -37,7 +37,6 @@
             ]);
 ?>
 			</div>
-			<!-- div class="title" -->
 			<div class="title-graph">
 <?php if ($this->MatchSchedule->getSeasonYear($this->request->getQuery('season')) == 2016) { ?>
 					<h2>J1リーグ  <?php echo $this->MatchSchedule->getSeasonYear($this->request->getQuery('season')); ?>シーズン | 年間勝点順位グラフ</h1>
@@ -58,7 +57,7 @@
 			<div class="title-caution">
 				<p>※第<?php echo $target_match_num; ?>節終了時点</p>
 			</div>
-			<table>
+			<table class="rank-table">
 				<tr>
 					<th>順位</th><th>クラブ</th><th>勝ち点</th><th>試合数</th><th>ゴール数</th><th>失点数</th><th>得失点差</th>
 				</tr>
@@ -66,8 +65,18 @@
     // 順位設定変数初期化
 	$rank = 1;
 	foreach ($table_data as $data) {
+	    if ($rank == 1) {
 ?>
+				<tr class="rank-afc">
+<?php } else if ($rank == 2 || $rank == 3) { ?>
+				<tr class="rank-afc-playoff">
+<?php } else if ($rank == 16) { ?>
+				<tr class="rank-j2playoffrelegation">
+<?php } else if ($rank == 17 || $rank == 18) { ?>
+				<tr class="rank-j2relegation">
+<?php } else { ?>
 				<tr>
+<?php } ?>
 					<td><?php echo $rank; // 順位 ?></td>
 					<td><?php echo $data->TeamName; // クラブ名 ?></td>
 					<td><?php echo $data->$table_data_key_name_resultsumpoint; // 勝ち点 ?></td>
