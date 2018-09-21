@@ -52,6 +52,12 @@
                     'text' => '2016',
                     'selected' => false,
                 ],
+                "2015" => [
+                    'season' => 2015,
+                    'value' => './match-results-graph?season=2015',
+                    'text' => '2015',
+                    'selected' => false,
+                ],
             );
 
             // Model呼び出しをインスタンス化
@@ -76,6 +82,13 @@
 
                 // Seasonフィルターの選択済み設定値をtrueへ変更
                 $this->season_filter[2016]['selected'] = true;
+            } else if ($this->request->getQuery('season') == 2015) { // get取得
+                // JleageD1Matchdata2016テーブルを呼び出しインスタンス化
+                $this->JleageMatchdata = TableRegistry::get('JleageD1Matchdata2015');
+                $this->JleageMatchResults = TableRegistry::get('JleageD1MatchResults2015');
+
+                // Seasonフィルターの選択済み設定値をtrueへ変更
+                $this->season_filter[2015]['selected'] = true;
             }
         }
 

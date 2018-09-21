@@ -17,23 +17,27 @@
 			<div class="match_day">
 <?php
             // ドロップダウンの表示
-			echo $this->Form->input(
-			    "Season", [
-			        "type" => "select",
-			        "options" => [
+            echo $this->Form->input(
+                "Season", [
+                    "type" => "select",
+                    "options" => [
                         [
-			                "value" => $season_filter[2018]['value'],
-			                "text" => $season_filter[2018]['text'],
-			                "selected" => $season_filter[2018]['selected']],
-			            [
-			                "value" => $season_filter[2017]['value'],
-			                "text" => $season_filter[2017]['text'],
-			                "selected" => $season_filter[2017]['selected']],
-			            [
-			                "value" => $season_filter[2016]['value'],
-			                "text" => $season_filter[2016]['text'],
-			                "selected" => $season_filter[2016]['selected']],
-			        ],
+                            "value" => $season_filter[2018]['value'],
+                            "text" => $season_filter[2018]['text'],
+                            "selected" => $season_filter[2018]['selected']],
+                        [
+                            "value" => $season_filter[2017]['value'],
+                            "text" => $season_filter[2017]['text'],
+                            "selected" => $season_filter[2017]['selected']],
+                        [
+                            "value" => $season_filter[2016]['value'],
+                            "text" => $season_filter[2016]['text'],
+                            "selected" => $season_filter[2016]['selected']],
+                        [
+                            "value" => $season_filter[2015]['value'],
+                            "text" => $season_filter[2015]['text'],
+                            "selected" => $season_filter[2015]['selected']],
+                    ],
             ]);
 ?>
 			</div>

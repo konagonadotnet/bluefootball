@@ -15,9 +15,12 @@
             } else if ($season == 2017) {
                 // 2017シーズン選択時
                 return 2017;
-            } else if ($season) {
+            } else if ($season == 2016) {
                 // 2016シーズン選択時
                 return 2016;
+            } else if ($season  == 2015) {
+                // 2016シーズン選択時
+                return 2015;
             }
         }
     }

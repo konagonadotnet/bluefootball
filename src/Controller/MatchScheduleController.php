@@ -37,6 +37,12 @@
                     'text' => '2016',
                     'selected' => false,
                 ],
+                "2015" => [
+                    'season' => 2015,
+                    'value' => './?season=2015',
+                    'text' => '2015',
+                    'selected' => false,
+                ],
             );
 
             // Model呼び出しをインスタンス化
@@ -58,6 +64,12 @@
 
                 // Seasonフィルターの選択済み設定値をtrueへ変更
                 $this->season_filter[2016]['selected'] = true;
+            } else if ($this->request->getQuery('season') == 2015) { // get取得
+                // JleageD1Matchdata2015テーブルを呼び出しインスタンス化
+                $this->JleageMatchdata = TableRegistry::get('JleageD1Matchdata2015');
+
+                // Seasonフィルターの選択済み設定値をtrueへ変更
+                $this->season_filter[2015]['selected'] = true;
             }
         }
 
@@ -114,7 +126,7 @@
                     $match_schedule_data[$count_num]['AnkerId'] = '';
                 } else {
                     $target_day = date('Y/m/d H:i', strtotime($match_data->MatchDayTime));
-                    if((strtotime($target_day) <= strtotime($today)) && (strtotime($today) <= strtotime($match_data->MatchDayTime) + 60*110)) {
+                    if((strtotime($target_day) <= strtotime($today)) && (strtotime($today) <= strtotime($match_data->MatchDayTime) + 60 * 110)) {
                         // 現在の時刻が試合開始時刻  + 110分以内の場合
                         $match_schedule_data[$count_num]['MatchState'] = '試合中';
                     } else if (strtotime($target_day) < strtotime($today)){

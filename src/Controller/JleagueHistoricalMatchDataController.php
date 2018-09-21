@@ -18,7 +18,8 @@
         public function initialize() {
             // シーズン選択
             // $this->season_year = 2017;
-            $this->season_year = 2016;
+            // $this->season_year = 2016;
+            $this->season_year = 2015;
 
             // configファイル、Table呼び出し用設定値を設定
             if ($this->season_year == 2017) {
@@ -30,8 +31,7 @@
                     'TableMatchResults' => 'JleageD1MatchResults2017',
                     'DataMaxNum' => 60, // htmlからのデータ取得箇所数の設定値
                 );
-            }
-            if ($this->season_year == 2016) {
+            } else if ($this->season_year == 2016) {
                 $this->conf_val = array(
                     'season' => 2016,
                     'category' => 'j1',
@@ -40,6 +40,17 @@
                     'TableMatchResults' => 'JleageD1MatchResults2016',
                     'DataMaxNum' => 46, // htmlからのデータ取得箇所数の設定値
                 );
+            } else if ($this->season_year == 2015) {
+                $this->conf_val = array(
+                    'season' => 2015,
+                    'category' => 'j1',
+                    'url' => 'j1league2015URL',
+                    'TableMatchdata' => 'JleageD1Matchdata2015',
+                    'TableMatchResults' => 'JleageD1MatchResults2015',
+                    'DataMaxNum' => 49, // htmlからのデータ取得箇所数の設定値
+                );
+            } else {
+                $this->season_year = null;
             }
         }
 
@@ -66,8 +77,8 @@
                 // ログへメッセージ保存
                 Log::info('URL先からhtml取得::::FALSE ($html)', 'jleague_historical_matchdata');
 
-                // 該当のURLが存在しない場合、該当のデータはスキップ
-                continue;
+                // 該当のURLが存在しない場合、データ取得処理を停止
+                exit('URL先からhtml取得::::FALSE ($html)');
             }
 
             // 取得したhtmlをHtmlDomParserへ設定
@@ -136,7 +147,7 @@
                 // 半角数字以外は削除
                 if ($this->season_year == 2017) { // 2017シーズンの場合、半角数字以外は削除し節数を格納
                     $result_match_num = preg_replace('/[^0-9]/', '', $result_match_num_data->plaintext);
-                } else if ($this->season_year == 2016) { // 2016シーズンの場合、ステージ数(1st or 2nd)を判定し節数を格納
+                } else if ($this->season_year == 2016 || $this->season_year == 2015) { // 2016シーズンの場合、ステージ数(1st or 2nd)を判定し節数を格納
                     // 区切り文字をスペースとして配列に変換する変数初期化
                     $table_stage_num_array = array();
 
@@ -282,7 +293,7 @@
             Log::info($this->conf_val['season'].'シーズン'.$this->conf_val['category'].'試合日程データ登録・更新準備完了', 'jleague_historical_matchdata');
 
             // 登録・更新処理開始
-            if ($this->season_year == 2016 || $this->season_year == 2017) {
+            if (!empty($this->season_year)) {
                 // ログへ登録処理開始メッセージ保存
                 Log::info($this->conf_val['season'].'シーズン'.$this->conf_val['category'].'試合日程データ登録処理::::Start', 'jleague_historical_matchdata');
 
