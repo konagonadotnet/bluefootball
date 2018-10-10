@@ -51,4 +51,9 @@ return [
             '0'=>'https://www.jleague.jp/special/match/2015/j1.html',
         )
     ),
+    '2014' => array(
+        'j1league2014URL' => array(
+            '0'=>'https://data.j-league.or.jp/SFMS01/search?competition_years=2014&competition_frame_ids=1',
+        )
+    ),
 ];

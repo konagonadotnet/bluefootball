@@ -37,6 +37,10 @@
                             "value" => $season_filter[2015]['value'],
                             "text" => $season_filter[2015]['text'],
                             "selected" => $season_filter[2015]['selected']],
+                        [
+                            "value" => $season_filter[2014]['value'],
+                            "text" => $season_filter[2014]['text'],
+                            "selected" => $season_filter[2014]['selected']],
                     ],
             ]);
 ?>

@@ -43,6 +43,12 @@
                     'text' => '2015',
                     'selected' => false,
                 ],
+                "2014" => [
+                    'season' => 2014,
+                    'value' => './?season=2014',
+                    'text' => '2014',
+                    'selected' => false,
+                ],
             );
 
             // Model呼び出しをインスタンス化
@@ -70,6 +76,12 @@
 
                 // Seasonフィルターの選択済み設定値をtrueへ変更
                 $this->season_filter[2015]['selected'] = true;
+            } else if ($this->request->getQuery('season') == 2014) { // get取得
+                // JleageD1Matchdata2014テーブルを呼び出しインスタンス化
+                $this->JleageMatchdata = TableRegistry::get('JleageD1Matchdata2014');
+
+                // Seasonフィルターの選択済み設定値をtrueへ変更
+                $this->season_filter[2014]['selected'] = true;
             }
         }
 
@@ -181,6 +193,9 @@
                 } else if ($data['ShortStadiumName2'] == $short_stadium_name_convert) {
                     // スタジアム名を返す
                     return $data['StadiumName2'];
+                } else if ($data['ShortStadiumName3'] == $short_stadium_name_convert) {
+                    // スタジアム名を返す
+                    return $data['StadiumName3'];
                 }
             }
 
