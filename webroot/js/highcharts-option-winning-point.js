@@ -6,16 +6,20 @@ $(function(){
 	// getJSON用url変数へ格納
 	var url = pathname + searchword;
 
+	// 数字のみを抽出しシーズン値を設定
+	season_filter = searchword.replace(/[^0-9]/g, "");
+	if (season_filter == '') {
+		// カラの場合、最新シーズンを設定
+		season_filter = 2018;
+	}
+
 	// グラフタイトル名を設定
-	if (searchword == '?season=2017') {
-		// 2017シーズンのグラフタイトルを設定
-		var title_text = '2017 J1リーグ 順位推移';
-	} else if(searchword == '?season=2016') {
-		// 2016シーズンのグラフタイトルを設定
-		var title_text = '2016 J1リーグ 年間勝点推移';
+	if (season_filter == 2015 || season_filter == 2016) {
+		// 2シーズン制のグラフタイトルを設定
+		var title_text = season_filter + ' J1リーグ 年間勝点推移';
 	} else {
-		// 2018シーズンのグラフタイトルを設定
-		var title_text = '2018 J1リーグ 順位推移';
+		// 1シーズン制のグラフタイトルを設定
+		var title_text = season_filter + ' J1リーグ 順位推移';
 	}
 
 	$.getJSON(

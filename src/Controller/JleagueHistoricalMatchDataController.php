@@ -20,7 +20,17 @@
             // $this->season_year = 2017;
             // $this->season_year = 2016;
             // $this->season_year = 2015;
-            $this->season_year = 2014;
+            // $this->season_year = 2014;
+            // $this->season_year = 2013;
+            // $this->season_year = 2012;
+            // $this->season_year = 2011;
+            // $this->season_year = 2010;
+            // $this->season_year = 2009;
+            // $this->season_year = 2008;
+            // $this->season_year = 2007;
+            // $this->season_year = 2006;
+            // $this->season_year = 2005;
+            $this->season_year = null;
 
             // configファイル、Table呼び出し用設定値を設定
             if ($this->season_year == 2017) {
@@ -57,6 +67,87 @@
                     'url' => 'j1league2014URL',
                     'TableMatchdata' => 'JleageD1Matchdata2014',
                     'TableMatchResults' => 'JleageD1MatchResults2014',
+                    'DataMaxNum' => 306, // htmlからのデータ取得箇所数の設定値
+                );
+            } else if ($this->season_year == 2013) {
+                $this->conf_val = array(
+                    'season' => 2013,
+                    'category' => 'j1',
+                    'url' => 'j1league2013URL',
+                    'TableMatchdata' => 'JleageD1Matchdata2013',
+                    'TableMatchResults' => 'JleageD1MatchResults2013',
+                    'DataMaxNum' => 306, // htmlからのデータ取得箇所数の設定値
+                );
+            } else if ($this->season_year == 2012) {
+                $this->conf_val = array(
+                    'season' => 2012,
+                    'category' => 'j1',
+                    'url' => 'j1league2012URL',
+                    'TableMatchdata' => 'JleageD1Matchdata2012',
+                    'TableMatchResults' => 'JleageD1MatchResults2012',
+                    'DataMaxNum' => 306, // htmlからのデータ取得箇所数の設定値
+                );
+            } else if ($this->season_year == 2011) {
+                $this->conf_val = array(
+                    'season' => 2011,
+                    'category' => 'j1',
+                    'url' => 'j1league2011URL',
+                    'TableMatchdata' => 'JleageD1Matchdata2011',
+                    'TableMatchResults' => 'JleageD1MatchResults2011',
+                    'DataMaxNum' => 306, // htmlからのデータ取得箇所数の設定値
+                );
+            } else if ($this->season_year == 2010) {
+                $this->conf_val = array(
+                    'season' => 2010,
+                    'category' => 'j1',
+                    'url' => 'j1league2010URL',
+                    'TableMatchdata' => 'JleageD1Matchdata2010',
+                    'TableMatchResults' => 'JleageD1MatchResults2010',
+                    'DataMaxNum' => 306, // htmlからのデータ取得箇所数の設定値
+                );
+            } else if ($this->season_year == 2009) {
+                $this->conf_val = array(
+                    'season' => 2009,
+                    'category' => 'j1',
+                    'url' => 'j1league2009URL',
+                    'TableMatchdata' => 'JleageD1Matchdata2009',
+                    'TableMatchResults' => 'JleageD1MatchResults2009',
+                    'DataMaxNum' => 306, // htmlからのデータ取得箇所数の設定値
+                );
+            } else if ($this->season_year == 2008) {
+                $this->conf_val = array(
+                    'season' => 2008,
+                    'category' => 'j1',
+                    'url' => 'j1league2008URL',
+                    'TableMatchdata' => 'JleageD1Matchdata2008',
+                    'TableMatchResults' => 'JleageD1MatchResults2008',
+                    'DataMaxNum' => 306, // htmlからのデータ取得箇所数の設定値
+                );
+            } else if ($this->season_year == 2007) {
+                $this->conf_val = array(
+                    'season' => 2007,
+                    'category' => 'j1',
+                    'url' => 'j1league2007URL',
+                    'TableMatchdata' => 'JleageD1Matchdata2007',
+                    'TableMatchResults' => 'JleageD1MatchResults2007',
+                    'DataMaxNum' => 306, // htmlからのデータ取得箇所数の設定値
+                );
+            } else if ($this->season_year == 2006) {
+                $this->conf_val = array(
+                    'season' => 2006,
+                    'category' => 'j1',
+                    'url' => 'j1league2006URL',
+                    'TableMatchdata' => 'JleageD1Matchdata2006',
+                    'TableMatchResults' => 'JleageD1MatchResults2006',
+                    'DataMaxNum' => 306, // htmlからのデータ取得箇所数の設定値
+                );
+            } else if ($this->season_year == 2005) {
+                $this->conf_val = array(
+                    'season' => 2005,
+                    'category' => 'j1',
+                    'url' => 'j1league2005URL',
+                    'TableMatchdata' => 'JleageD1Matchdata2005',
+                    'TableMatchResults' => 'JleageD1MatchResults2005',
                     'DataMaxNum' => 306, // htmlからのデータ取得箇所数の設定値
                 );
             } else {
@@ -697,6 +788,120 @@
             }
 
             return true;
+        }
+
+        /*
+         * 試合結果データテーブルのプライマリカラムデータチェック・新規登録処理
+         * データが1つでも存在しない場合のみ登録を行う
+         */
+        public function CheckMatchResultsTeamNameData() {
+            // ログへ試合結果データテーブルのプライマリカラムデータチェック・新規登録処理開始メッセージ保存
+            Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'プライマリカラムデータチェック・新規登録処理::::Start', 'jleague_historical_matchdata');
+
+            // J1チームデータModel呼び出し
+            $jleageteams = TableRegistry::get('JleageTeams');
+            // チーム名データ取得
+            $teams_data = $jleageteams->getJleageTeams();
+            if (empty($teams_data)) {
+                // ログへ試合結果登録・更新処理開始メッセージ保存
+                Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'プライマリカラムデータチェック・新規登録処理::::チーム名が取得できませんでした', 'jleague_historical_matchdata');
+            }
+
+            // J1試合日程データのModel呼び出し
+            $jleagedmatchdata = TableRegistry::get($this->conf_val['TableMatchdata']);
+
+            // 節数設定
+            $match_num = 1;
+            // 登録対象の略称チームを取得
+            $team_name_data = $jleagedmatchdata->getTeamNameData($match_num);
+            // 略称チーム名格納用配列初期化
+            $short_team_name = array();
+            // 登録対象の略称チーム名データを成形
+            foreach ($team_name_data->toArray() as $data) {
+                $short_team_name[] = $data['HomeTeam'];
+                $short_team_name[] = $data['AwayTeam'];
+            }
+
+            // 登録対象の略称チーム名をキーにして登録対象データ取得
+            $target_team_data = $jleageteams->getTeamDataSetShortTeamName($short_team_name);
+
+            // 登録対象データ格納用配列初期化
+            $target_data = array();
+            // 登録対象のチームデータを成形
+            foreach ($target_team_data->toArray() as $data) {
+                $target_data[] = array(
+                    'id' => $data['id'],
+                    'TeamName' => $data['TeamName'],
+                    'ShortTeamName' => $data['ShortTeamName'],
+                );
+            }
+
+            // 登録対象データチェック結果格納用配列初期化
+            $check_data_array = array();
+            // 登録対象データチェック
+            foreach ($short_team_name as $short_teamname_data) {
+                // 初期値として略称チーム名をキーに'NG'を設定 
+                $check_data_array[$short_teamname_data] = 'NG';
+
+                // 登録対象データが存在するかどうか判定
+                foreach ($target_data as $data) {
+                    // 登録対象データチェック
+                    if ($short_teamname_data == $data['ShortTeamName']) {
+                        // 登録対象データが存在する場合、'OK'を設定 
+                        $check_data_array[$data['ShortTeamName']] = 'OK';
+                        // ループをスキップ
+                        break;
+                    }
+                }
+            }
+
+            // 登録対象データに未登録のチームが存在するかどうかチェック
+            foreach ($check_data_array as $key => $data) {
+                // 未登録のチームが存在する場合、ログへメッセージ出力し処理を終了
+                if ($data == 'NG') {
+                    // ログへプライマリカラムデータチェック・新規登録処理対象データなしメッセージ保存
+                    Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'プライマリカラムデータチェック・新規登録処理::::対象データが存在しません::::'.$key, 'jleague_historical_matchdata');
+                    // 登録処理を終了
+                    exit();
+                }
+            }
+
+            // J1試合結果登録用テーブルのModel呼び出し
+            $jleagedmatchresults = TableRegistry::get($this->conf_val['TableMatchResults']);
+            if (empty($jleagedmatchresults)) {
+                // ログへ試合結果登録・更新処理開始メッセージ保存
+                Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'プライマリカラムデータチェック・新規登録処理::::J1試合結果登録用テーブル存在していません::::FALSE', 'jleague_historical_matchdata');
+                // テーブルが存在しない場合、処理を終了
+                exit();
+            }
+
+            // J1試合結果登録用テーブルのデータを取得
+            $table_data = $jleagedmatchresults->getTeamNameData();
+
+            // データ登録完了フラグを初期化
+            $resist_flg = false;
+            // データの有無判定
+            if ($table_data == false) {
+                // データが存在しない場合、全チーム名データ登録
+                $resist_flg = $jleagedmatchresults->insertTeamNameData($target_data);
+                if ($resist_flg == false) {
+                    // ログへ試合結果登録・更新処理開始メッセージ保存
+                    Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'プライマリカラムデータチェック・新規登録処理::::全チーム名データ登録失敗::::FALSE', 'jleague_historical_matchdata');
+                    // 処理を終了
+                    exit();
+                }
+                
+                // ログへ試合結果登録・更新処理開始メッセージ保存
+                Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'プライマリカラムデータチェック・新規登録処理::::全チーム名データ登録完了', 'jleague_historical_matchdata');
+            } else {
+                // データが1つでも存在する場合、ログへ登録対象を出力
+                Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'プライマリカラムデータチェック・新規登録処理::::既にデータが存在します。手動により登録を行ってください。対象データ$target_data = '.print_r($target_data, true), 'jleague_historical_matchdata');
+            }
+            
+             // ログへ試合結果データテーブルのプライマリカラムデータチェック・新規登録処理開始メッセージ保存
+             Log::info($this->season_year.'シーズン'.$this->conf_val['category'].'プライマリカラムデータチェック・新規登録処理::::End', 'jleague_historical_matchdata');
+             // 処理を終了
+             exit();
         }
 
         /*

@@ -56,4 +56,49 @@ return [
             '0'=>'https://data.j-league.or.jp/SFMS01/search?competition_years=2014&competition_frame_ids=1',
         )
     ),
+    '2013' => array(
+        'j1league2013URL' => array(
+            '0'=>'https://data.j-league.or.jp/SFMS01/search?competition_years=2013&competition_frame_ids=1',
+        )
+    ),
+    '2012' => array(
+        'j1league2012URL' => array(
+            '0'=>'https://data.j-league.or.jp/SFMS01/search?competition_years=2012&competition_frame_ids=1',
+        )
+    ),
+    '2011' => array(
+        'j1league2011URL' => array(
+            '0'=>'https://data.j-league.or.jp/SFMS01/search?competition_years=2011&competition_frame_ids=1',
+        )
+    ),
+    '2010' => array(
+        'j1league2010URL' => array(
+            '0'=>'https://data.j-league.or.jp/SFMS01/search?competition_years=2010&competition_frame_ids=1',
+        )
+    ),
+    '2009' => array(
+        'j1league2009URL' => array(
+            '0'=>'https://data.j-league.or.jp/SFMS01/search?competition_years=2009&competition_frame_ids=1',
+        )
+    ),
+    '2008' => array(
+        'j1league2008URL' => array(
+            '0'=>'https://data.j-league.or.jp/SFMS01/search?competition_years=2008&competition_frame_ids=1',
+        )
+    ),
+    '2007' => array(
+        'j1league2007URL' => array(
+            '0'=>'https://data.j-league.or.jp/SFMS01/search?competition_years=2007&competition_frame_ids=1',
+        )
+    ),
+    '2006' => array(
+        'j1league2006URL' => array(
+            '0'=>'https://data.j-league.or.jp/SFMS01/search?competition_years=2006&competition_frame_ids=1',
+        )
+    ),
+    '2005' => array(
+        'j1league2005URL' => array(
+            '0'=>'https://data.j-league.or.jp/SFMS01/search?competition_years=2005&competition_frame_ids=1',
+        )
+    ),
 ];

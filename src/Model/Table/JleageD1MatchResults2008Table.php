@@ -5,10 +5,10 @@
     // logファイル出力のため
     use Cake\Log\Log;
 
-    class JleageD1MatchResults2014Table extends Table {
+    class JleageD1MatchResults2008Table extends Table {
 
         public function initialize(array $config) {
-            $this->setTable('jleage_d1_match_results2014');
+            $this->setTable('jleage_d1_match_results2008');
             $this->setPrimaryKey('id');
         }
 

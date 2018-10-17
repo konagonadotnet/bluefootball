@@ -42,7 +42,43 @@
                         [
                             "value" => $season_filter[2014]['value'],
                             "text" => $season_filter[2014]['text'],
-                            "selected" => $season_filter[2014]['selected']],
+							"selected" => $season_filter[2014]['selected']],
+						[
+							"value" => $season_filter[2013]['value'],
+							"text" => $season_filter[2013]['text'],
+							"selected" => $season_filter[2013]['selected']],
+						[
+							"value" => $season_filter[2012]['value'],
+							"text" => $season_filter[2012]['text'],
+							"selected" => $season_filter[2012]['selected']],
+						[
+							"value" => $season_filter[2011]['value'],
+							"text" => $season_filter[2011]['text'],
+							"selected" => $season_filter[2011]['selected']],
+						[
+							"value" => $season_filter[2010]['value'],
+							"text" => $season_filter[2010]['text'],
+							"selected" => $season_filter[2010]['selected']],
+						[
+							"value" => $season_filter[2009]['value'],
+							"text" => $season_filter[2009]['text'],
+							"selected" => $season_filter[2009]['selected']],
+						[
+							"value" => $season_filter[2008]['value'],
+							"text" => $season_filter[2008]['text'],
+							"selected" => $season_filter[2008]['selected']],
+						[
+							"value" => $season_filter[2007]['value'],
+							"text" => $season_filter[2007]['text'],
+							"selected" => $season_filter[2007]['selected']],
+						[
+							"value" => $season_filter[2006]['value'],
+							"text" => $season_filter[2006]['text'],
+							"selected" => $season_filter[2006]['selected']],
+						[
+							"value" => $season_filter[2005]['value'],
+							"text" => $season_filter[2005]['text'],
+							"selected" => $season_filter[2005]['selected']],
                     ],
             ]);
 ?>
